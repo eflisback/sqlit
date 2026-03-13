@@ -1,6 +1,7 @@
 import type { Database, Sqlite3Static } from '@sqliteai/sqlite-wasm';
 import sqlite3InitModule from '@sqliteai/sqlite-wasm';
 import { expose } from 'comlink';
+import type { SqlResult } from './types';
 
 let sqlite3: Sqlite3Static | null = null;
 let db: Database | null = null;
@@ -14,7 +15,7 @@ const getDb = async () => {
 };
 
 export const engine = {
-	query: async (sql: string) => {
+	query: async (sql: string): Promise<SqlResult> => {
 		const db = await getDb();
 		return db.exec(sql, { rowMode: 'object', returnValue: 'resultRows' });
 	},

@@ -1,26 +1,18 @@
-import { useState } from 'react';
-import { engine } from './engine/wrapper';
+import styles from './App.module.css';
+import { Cell } from './components/cells';
+import { useNotebookStore } from './store';
 
 function App() {
-	const [result, setResult] = useState<string | null>(null);
-	const [loading, setLoading] = useState(false);
-
-	const run = async () => {
-		setLoading(true);
-		try {
-			const rows = await engine.query('SELECT sqlite_version() AS version');
-			setResult(JSON.stringify(rows, null, 2));
-		} finally {
-			setLoading(false);
-		}
-	};
+	const cells = useNotebookStore((state) => state.cells);
 
 	return (
 		<>
-			<button type='button' disabled={loading} onClick={run}>
-				{loading ? 'Running...' : 'Run SQL'}
-			</button>
-			{result && <pre>{result}</pre>}
+			<header>Header</header>
+			<main className={styles.notebook}>
+				{cells.map((cellData) => (
+					<Cell key={cellData.id} cellData={cellData} />
+				))}
+			</main>
 		</>
 	);
 }
