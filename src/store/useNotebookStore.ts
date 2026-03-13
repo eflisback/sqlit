@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { CellData } from './types';
+import welcomeCell from './welcome-cell.md?raw';
 
 interface NotebookStore {
 	cells: CellData[];
@@ -8,9 +9,15 @@ interface NotebookStore {
 export const useNotebookStore = create<NotebookStore>(() => ({
 	cells: [
 		{
-			id: 'example',
+			id: 'welcome',
 			type: 'markdown',
-			content: 'Welcome to SQLiteler!',
+			content: welcomeCell,
+		},
+		{
+			id: 'sqliteVersion',
+			type: 'sql',
+			content: 'SELECT sqlite_version() AS version',
+			result: null,
 		},
 	],
 }));

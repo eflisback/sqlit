@@ -1,4 +1,4 @@
-import type { CellData } from '../../store';
+import type { CellData } from '@/store';
 
 interface SQLCellProps {
 	cellData: Extract<CellData, { type: 'sql' }>;

@@ -1,6 +1,7 @@
 .notebook {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
+	gap: 20px;
 	flex: 1;
 	padding: 0 30vw;
 }

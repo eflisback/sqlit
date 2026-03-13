@@ -1,0 +1,18 @@
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+	margin: unset;
+}
+
+button {
+	background-color: unset;
+	outline: unset;
+	border: unset;
+	font-size: inherit;
+	padding: unset;
+	cursor: pointer;
+}

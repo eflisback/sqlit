@@ -1,9 +1,10 @@
-import type { CellData } from '../../store';
+import Markdown from 'react-markdown';
+import type { CellData } from '@/store';
 
 interface MarkdownCellProps {
 	cellData: Extract<CellData, { type: 'markdown' }>;
 }
 
 export const MarkdownCell = ({ cellData }: MarkdownCellProps) => {
-	return <div>{cellData.content}</div>;
+	return <Markdown>{cellData.content}</Markdown>;
 };
