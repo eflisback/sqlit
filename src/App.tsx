@@ -1,5 +1,5 @@
 import styles from './App.module.css';
-import { Cell } from './components/cells';
+import { Cell } from './components';
 import { useNotebookStore } from './store';
 
 function App() {

@@ -4,7 +4,8 @@ h3,
 h4,
 h5,
 h6,
-p {
+p,
+pre {
 	margin: unset;
 }
 
@@ -13,6 +14,7 @@ button {
 	outline: unset;
 	border: unset;
 	font-size: inherit;
+	color: inherit;
 	padding: unset;
 	cursor: pointer;
 }

@@ -1,12 +1,11 @@
 .cell {
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
+	gap: 15px;
 	width: 100%;
 	height: fit-content;
-	padding: 15px;
-	border-radius: 4px;
 	background-color: #fafafa;
+	padding: 30px;
 }
 
 .cell header {

@@ -1,5 +1,5 @@
 import { MdDelete, MdInfo, MdStorage } from 'react-icons/md';
-import type { CellData } from '@/store';
+import { type CellData, useNotebookStore } from '@/store';
 import styles from './cells.module.css';
 import { MarkdownCell } from './MarkdownCell';
 import { SQLCell } from './SQLCell';
@@ -14,7 +14,13 @@ interface CellProps {
 }
 
 export const Cell = ({ cellData }: CellProps) => {
+	const removeCell = useNotebookStore((state) => state.removeCell);
+	const editable = useNotebookStore((state) => state.editable);
 	const { Icon, label } = CELL_META[cellData.type];
+
+	const handleDeleteButtonClick = () => {
+		removeCell(cellData.id);
+	};
 
 	return (
 		<article className={styles.cell}>
@@ -24,9 +30,11 @@ export const Cell = ({ cellData }: CellProps) => {
 					<span>{label}</span>
 				</section>
 				<section>
-					<button type='button'>
-						<MdDelete />
-					</button>
+					{editable && (
+						<button type='button' onClick={handleDeleteButtonClick}>
+							<MdDelete />
+						</button>
+					)}
 				</section>
 			</header>
 			{cellData.type === 'markdown' ? (
