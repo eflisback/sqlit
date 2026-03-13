@@ -1,12 +1,12 @@
-import { MdDelete, MdInfo, MdStorage } from 'react-icons/md';
+import { FaDatabase, FaMarkdown, FaTrash } from 'react-icons/fa6';
 import { type CellData, useNotebookStore } from '@/store';
 import styles from './cells.module.css';
 import { MarkdownCell } from './MarkdownCell';
 import { SQLCell } from './SQLCell';
 
 const CELL_META = {
-	markdown: { Icon: MdInfo, label: 'info' },
-	sql: { Icon: MdStorage, label: 'sql' },
+	markdown: { Icon: FaMarkdown, label: 'info' },
+	sql: { Icon: FaDatabase, label: 'sql' },
 };
 
 interface CellProps {
@@ -32,7 +32,7 @@ export const Cell = ({ cellData }: CellProps) => {
 				<section>
 					{editable && (
 						<button type='button' onClick={handleDeleteButtonClick}>
-							<MdDelete />
+							<FaTrash />
 						</button>
 					)}
 				</section>

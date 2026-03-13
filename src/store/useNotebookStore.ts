@@ -6,6 +6,7 @@ interface NotebookStore {
 	cells: CellData[];
 	editable: boolean;
 	insertCell: (cellData: CellData, index: number) => void;
+	updateCell: (id: string, cellData: CellData) => void;
 	removeCell: (id: string) => void;
 }
 
@@ -32,6 +33,10 @@ export const useNotebookStore = create<NotebookStore>((set) => ({
 				cellData,
 				...prev.cells.slice(index),
 			],
+		})),
+	updateCell: (id, cellData) =>
+		set((prev) => ({
+			cells: prev.cells.map((cell) => (cell.id === id ? cellData : cell)),
 		})),
 	removeCell: (id) =>
 		set((prev) => ({

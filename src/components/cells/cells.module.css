@@ -4,7 +4,7 @@
 	gap: 15px;
 	width: 100%;
 	height: fit-content;
-	background-color: #fafafa;
+	background-color: #ffffff;
 	padding: 30px;
 }
 
@@ -21,4 +21,52 @@
 	flex-direction: row;
 	align-items: center;
 	gap: 5px;
+}
+
+.actions button {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 5px;
+	padding: 5px 10px;
+	background-color: #e4e5f1;
+	color: rgb(53, 53, 53);
+	border-radius: 8px;
+	font-size: 0.7em;
+}
+
+.actions button:hover {
+	color: black;
+}
+
+.resultTable {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.875rem;
+}
+
+.resultTable th,
+.resultTable td {
+	text-align: left;
+	border-bottom: 1px solid gray;
+}
+
+.resultTable th {
+	font-weight: 600;
+	border-bottom-color: #d1d5db;
+}
+
+.resultTable tbody tr:last-child td {
+	border-bottom: none;
+}
+
+.error {
+	font-size: 0.875rem;
+	color: #b91c1c;
+	font-family: monospace;
+}
+
+.editor * {
+	/* biome-ignore lint/complexity/noImportantStyles: Override default CodeMirror styling */
+	outline: none !important;
 }
