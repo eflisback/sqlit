@@ -11,6 +11,8 @@
 		"preview": "vite preview"
 	},
 	"dependencies": {
+		"@sqliteai/sqlite-wasm": "3.50.4-sync.0.8.68-vector.0.9.93-memory.0.7.2",
+		"comlink": "^4.4.2",
 		"react": "^19.2.4",
 		"react-dom": "^19.2.4"
 	},
