@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { FaDatabase, FaMarkdown, FaTrash } from 'react-icons/fa6';
 import { type CellData, useNotebookStore } from '@/store';
 import styles from './cells.module.css';
@@ -14,6 +15,9 @@ interface CellProps {
 }
 
 export const Cell = ({ cellData }: CellProps) => {
+	const [cellStatus, setCellStatus] = useState<'none' | 'success' | 'failure'>(
+		'none',
+	);
 	const removeCell = useNotebookStore((state) => state.removeCell);
 	const editable = useNotebookStore((state) => state.editable);
 	const { Icon, label } = CELL_META[cellData.type];
@@ -23,7 +27,7 @@ export const Cell = ({ cellData }: CellProps) => {
 	};
 
 	return (
-		<article className={styles.cell}>
+		<article className={`${styles.cell} ${styles[cellStatus]}`}>
 			<header>
 				<section>
 					<Icon />
@@ -40,7 +44,7 @@ export const Cell = ({ cellData }: CellProps) => {
 			{cellData.type === 'markdown' ? (
 				<MarkdownCell cellData={cellData} />
 			) : (
-				<SQLCell cellData={cellData} />
+				<SQLCell cellData={cellData} setCellStatus={setCellStatus} />
 			)}
 		</article>
 	);

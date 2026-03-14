@@ -6,6 +6,17 @@
 	height: fit-content;
 	background-color: #ffffff;
 	padding: 30px;
+	border-radius: 8px;
+	border-left: 5px solid lightgray;
+	transition: border 0.15s ease;
+}
+
+.success {
+	border-color: green;
+}
+
+.failure {
+	border-color: #b91c1c;
 }
 
 .cell header {

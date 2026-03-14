@@ -8,9 +8,10 @@ import styles from './cells.module.css';
 
 interface SQLCellProps {
 	cellData: Extract<CellData, { type: 'sql' }>;
+	setCellStatus: (status: 'none' | 'success' | 'failure') => void;
 }
 
-export const SQLCell = ({ cellData }: SQLCellProps) => {
+export const SQLCell = ({ cellData, setCellStatus }: SQLCellProps) => {
 	const updateCell = useNotebookStore((state) => state.updateCell);
 	const [error, setError] = useState<string | null>(null);
 
@@ -19,9 +20,11 @@ export const SQLCell = ({ cellData }: SQLCellProps) => {
 			const result = await engine.query(cellData.content);
 			updateCell(cellData.id, { ...cellData, result });
 			setError(null);
+			setCellStatus('success');
 		} catch (e: unknown) {
 			setError(e instanceof Error ? e.message : String(e));
 			updateCell(cellData.id, { ...cellData, result: null });
+			setCellStatus('failure');
 		}
 	};
 
