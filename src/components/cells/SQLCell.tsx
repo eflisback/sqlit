@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { FaPlay } from 'react-icons/fa6';
 import { engine } from '@/engine';
 import { type CellData, useNotebookStore } from '@/store';
+import { useTheme } from '@/components';
 import styles from './cells.module.css';
 
 interface SQLCellProps {
@@ -14,6 +15,7 @@ interface SQLCellProps {
 export const SQLCell = ({ cellData, setCellStatus }: SQLCellProps) => {
 	const updateCell = useNotebookStore((state) => state.updateCell);
 	const [error, setError] = useState<string | null>(null);
+	const { theme } = useTheme();
 
 	const handleExecuteClick = async () => {
 		try {
@@ -33,6 +35,7 @@ export const SQLCell = ({ cellData, setCellStatus }: SQLCellProps) => {
 			<CodeMirror
 				className={styles.editor}
 				basicSetup={{ autocompletion: false }}
+				theme={theme}
 				value={cellData.content}
 				extensions={[sql()]}
 				onChange={(code) =>

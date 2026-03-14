@@ -1,0 +1,21 @@
+[data-theme="light"] {
+	--text-primary: #0f0e1a;
+	--text-secondary: #6b6882;
+	--bg-page: #e4e4ec;
+	--bg-cell: #ffffff;
+	--border: #cdccda;
+	--color-success: #27ce80;
+	--color-failure: #ff3b55;
+	--color-link: #4f3ff0;
+}
+
+[data-theme="dark"] {
+	--text-primary: #e8e7ff;
+	--text-secondary: #9896b8;
+	--bg-page: #13121f;
+	--bg-cell: #1e1d2e;
+	--border: #3d3b54;
+	--color-success: #27ce9c;
+	--color-failure: #ff3b65;
+	--color-link: #8b7fff;
+}

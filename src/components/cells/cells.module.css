@@ -4,19 +4,18 @@
 	gap: 15px;
 	width: 100%;
 	height: fit-content;
-	background-color: #ffffff;
+	background-color: var(--bg-cell);
 	padding: 30px;
 	border-radius: 8px;
-	border-left: 5px solid lightgray;
-	transition: border 0.15s ease;
+	border-left: 5px solid var(--border);
 }
 
 .success {
-	border-color: green;
+	border-color: var(--color-success);
 }
 
 .failure {
-	border-color: #b91c1c;
+	border-color: var(--color-failure);
 }
 
 .cell header {
@@ -25,6 +24,7 @@
 	justify-content: space-between;
 	align-items: center;
 	font-weight: bold;
+	color: var(--text-secondary);
 }
 
 .cell header section {
@@ -40,14 +40,14 @@
 	align-items: center;
 	gap: 5px;
 	padding: 5px 10px;
-	background-color: #e4e5f1;
-	color: rgb(53, 53, 53);
+	background-color: var(--bg-page);
+	color: var(--text-secondary);
 	border-radius: 8px;
 	font-size: 0.7em;
 }
 
 .actions button:hover {
-	color: black;
+	color: var(--text-primary);
 }
 
 .resultTable {
@@ -59,12 +59,12 @@
 .resultTable th,
 .resultTable td {
 	text-align: left;
-	border-bottom: 1px solid gray;
+	border-bottom: 1px solid var(--border);
 }
 
 .resultTable th {
 	font-weight: 600;
-	border-bottom-color: #d1d5db;
+	border-bottom-color: var(--border);
 }
 
 .resultTable tbody tr:last-child td {
@@ -73,7 +73,7 @@
 
 .error {
 	font-size: 0.875rem;
-	color: #b91c1c;
+	color: var(--color-failure);
 	font-family: monospace;
 }
 
