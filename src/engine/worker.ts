@@ -17,7 +17,9 @@ const getDb = async () => {
 export const engine = {
 	query: async (sql: string): Promise<SqlResult> => {
 		const db = await getDb();
-		return db.exec(sql, { rowMode: 'object', returnValue: 'resultRows' });
+		const rows = db.exec(sql, { rowMode: 'object', returnValue: 'resultRows' });
+		const rowsAffected = db.changes();
+		return { rows, rowsAffected };
 	},
 };
 

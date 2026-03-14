@@ -44,26 +44,34 @@ export const SQLCell = ({ cellData }: SQLCellProps) => {
 			</section>
 			{cellData.result && (
 				<section className={styles.result}>
-					<table className={styles.resultTable}>
-						<thead>
-							<tr>
-								{Object.keys(cellData.result[0] ?? {}).map((col) => (
-									<th key={col}>{col}</th>
-								))}
-							</tr>
-						</thead>
-						<tbody>
-							{cellData.result.map((row, i) => (
-								// biome-ignore lint/suspicious/noArrayIndexKey: No stable key available
-								<tr key={i}>
-									{Object.values(row).map((val, j) => (
-										// biome-ignore lint/suspicious/noArrayIndexKey: Positional
-										<td key={j}>{String(val ?? '')}</td>
+					{cellData.result.rows.length > 0 ? (
+						<table className={styles.resultTable}>
+							<thead>
+								<tr>
+									{Object.keys(cellData.result.rows[0]).map((col) => (
+										<th key={col}>{col}</th>
 									))}
 								</tr>
-							))}
-						</tbody>
-					</table>
+							</thead>
+							<tbody>
+								{cellData.result.rows.map((row, i) => (
+									// biome-ignore lint/suspicious/noArrayIndexKey: No stable key available
+									<tr key={i}>
+										{Object.values(row).map((val, j) => (
+											// biome-ignore lint/suspicious/noArrayIndexKey: Positional
+											<td key={j}>{String(val ?? '')}</td>
+										))}
+									</tr>
+								))}
+							</tbody>
+						</table>
+					) : (
+						<p className={styles.status}>
+							{cellData.result.rowsAffected > 0
+								? `Query OK (${cellData.result.rowsAffected} change${cellData.result.rowsAffected > 1 ? 's' : ''} applied)`
+								: 'Query OK'}
+						</p>
+					)}
 				</section>
 			)}
 			{error && <section className={styles.error}>{error}</section>}
