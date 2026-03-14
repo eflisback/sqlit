@@ -14,15 +14,19 @@ export const useNotebookStore = create<NotebookStore>((set) => ({
 	editable: false,
 	cells: [
 		{
-			id: 'welcome',
+			id: 'welcome-markdown',
 			type: 'markdown',
 			content: welcomeCell,
 		},
 		{
-			id: 'sqliteVersion',
+			id: 'welcome-load',
+			type: 'load',
+			url: '/examples/users.sqlite',
+		},
+		{
+			id: 'welcome-sql',
 			type: 'sql',
-			content: 'SELECT sqlite_version() AS version',
-			editable: true,
+			content: 'SELECT * FROM users',
 			result: null,
 		},
 	],

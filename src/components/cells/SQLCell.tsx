@@ -2,9 +2,9 @@ import { sql } from '@codemirror/lang-sql';
 import CodeMirror from '@uiw/react-codemirror';
 import { useState } from 'react';
 import { FaPlay } from 'react-icons/fa6';
+import { useTheme } from '@/components';
 import { engine } from '@/engine';
 import { type CellData, useNotebookStore } from '@/store';
-import { useTheme } from '@/components';
 import styles from './cells.module.css';
 
 interface SQLCellProps {
@@ -14,10 +14,12 @@ interface SQLCellProps {
 
 export const SQLCell = ({ cellData, setCellStatus }: SQLCellProps) => {
 	const updateCell = useNotebookStore((state) => state.updateCell);
-	const [error, setError] = useState<string | null>(null);
 	const { theme } = useTheme();
+	const [error, setError] = useState<string | null>(null);
+	const [isLoading, setIsLoading] = useState(false);
 
 	const handleExecuteClick = async () => {
+		setIsLoading(true);
 		try {
 			const result = await engine.query(cellData.content);
 			updateCell(cellData.id, { ...cellData, result });
@@ -27,6 +29,8 @@ export const SQLCell = ({ cellData, setCellStatus }: SQLCellProps) => {
 			setError(e instanceof Error ? e.message : String(e));
 			updateCell(cellData.id, { ...cellData, result: null });
 			setCellStatus('failure');
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -37,15 +41,16 @@ export const SQLCell = ({ cellData, setCellStatus }: SQLCellProps) => {
 				basicSetup={{ autocompletion: false }}
 				theme={theme}
 				value={cellData.content}
+				editable={!isLoading}
 				extensions={[sql()]}
 				onChange={(code) =>
 					updateCell(cellData.id, { ...cellData, content: code })
 				}
 			/>
 			<section className={styles.actions}>
-				<button type='button' onClick={handleExecuteClick}>
+				<button type='button' onClick={handleExecuteClick} disabled={isLoading}>
 					<FaPlay />
-					<span>Run code block</span>
+					<span>{isLoading ? 'Running...' : 'Execute snippet'}</span>
 				</button>
 			</section>
 			{cellData.result && (
