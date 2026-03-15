@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FaDatabase, FaFileImport, FaMarkdown, FaTrash } from 'react-icons/fa6';
-import { type CellData, useNotebookStore } from '@/store';
+import { type CellData, useSheetStore } from '@/store';
 import styles from './cells.module.css';
 import { LoadCell } from './LoadCell';
 import { MarkdownCell } from './MarkdownCell';
@@ -33,8 +33,8 @@ export const Cell = ({ cellData }: CellProps) => {
 	const [cellStatus, setCellStatus] = useState<'none' | 'success' | 'failure'>(
 		'none',
 	);
-	const removeCell = useNotebookStore((state) => state.removeCell);
-	const editable = useNotebookStore((state) => state.editable);
+	const removeCell = useSheetStore((state) => state.removeCell);
+	const isEditMode = useSheetStore((state) => state.isEditMode);
 	const { Icon, label, information } = CELL_META[cellData.type];
 
 	const handleDeleteButtonClick = () => {
@@ -49,7 +49,7 @@ export const Cell = ({ cellData }: CellProps) => {
 					<span>{label}</span>
 				</section>
 				<section>
-					{editable && (
+					{isEditMode && (
 						<button type='button' onClick={handleDeleteButtonClick}>
 							<FaTrash />
 						</button>

@@ -50,24 +50,24 @@
 	color: var(--text-primary);
 }
 
-.resultTable {
+.result-table {
 	width: 100%;
 	border-collapse: collapse;
 	font-size: 0.875rem;
 }
 
-.resultTable th,
-.resultTable td {
+.result-table th,
+.result-table td {
 	text-align: left;
 	border-bottom: 1px solid var(--border);
 }
 
-.resultTable th {
+.result-table th {
 	font-weight: 600;
 	border-bottom-color: var(--border);
 }
 
-.resultTable tbody tr:last-child td {
+.result-table tbody tr:last-child td {
 	border-bottom: none;
 }
 
@@ -77,7 +77,7 @@
 	font-family: monospace;
 }
 
-.urlInput {
+.url-input {
 	width: 100%;
 	padding: 6px 10px;
 	background-color: var(--bg-page);

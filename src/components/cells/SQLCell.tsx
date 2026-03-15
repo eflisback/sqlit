@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { FaPlay } from 'react-icons/fa6';
 import { useTheme } from '@/components';
 import { engine } from '@/engine';
-import { type CellData, useNotebookStore } from '@/store';
+import { type CellData, useSheetStore } from '@/store';
 import styles from './cells.module.css';
 
 interface SQLCellProps {
@@ -13,7 +13,7 @@ interface SQLCellProps {
 }
 
 export const SQLCell = ({ cellData, setCellStatus }: SQLCellProps) => {
-	const updateCell = useNotebookStore((state) => state.updateCell);
+	const updateCell = useSheetStore((state) => state.updateCell);
 	const { theme } = useTheme();
 	const [error, setError] = useState<string | null>(null);
 	const [isLoading, setIsLoading] = useState(false);

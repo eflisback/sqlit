@@ -1,8 +1,0 @@
-.notebook {
-	display: flex;
-	flex-direction: column;
-	gap: 15px;
-	flex: 1;
-	margin: 0 20vw;
-	border-radius: 4px;
-}

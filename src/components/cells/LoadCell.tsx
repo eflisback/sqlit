@@ -44,7 +44,7 @@ export const LoadCell = ({ cellData, setCellStatus }: LoadCellProps) => {
 				</button>
 			</section>
 			{loaded && !error && (
-				<p className={styles.status}>Database loaded successfully</p>
+				<p className={styles.status}>Database loaded successfully.</p>
 			)}
 			{error && <section className={styles.error}>{error}</section>}
 		</>

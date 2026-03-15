@@ -16,6 +16,11 @@ export default defineConfig({
 			'Cross-Origin-Embedder-Policy': 'require-corp',
 		},
 	},
+	css: {
+		modules: {
+			localsConvention: 'camelCaseOnly',
+		},
+	},
 	optimizeDeps: {
 		exclude: ['@sqliteai/sqlite-wasm'],
 	},
