@@ -25,3 +25,10 @@ a {
 	text-decoration: none;
 	color: var(--color-link);
 }
+
+code {
+	background-color: var(--bg-page);
+	padding: 0 5px;
+	border: 1px solid var(--border);
+	border-radius: 8px;
+}
