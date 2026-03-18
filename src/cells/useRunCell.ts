@@ -1,31 +1,68 @@
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 import { useSheetStore } from '@/store';
-import type { CellData, CellResult } from '@/store/types';
+import type { CellData } from '@/store/types';
+import { executeCellData } from './executeCellData';
 import type { CellStatus } from './types';
 
-export function useRunCell<T extends CellData>(
-	cellData: T,
-	execute: (cellData: T) => Promise<CellResult>,
-): { isLoading: boolean; status: CellStatus; run: () => Promise<void> } {
+export function useRunCell(cellData: CellData): {
+	isLoading: boolean;
+	anyRunning: boolean;
+	status: CellStatus;
+	run: () => Promise<void>;
+	runWithPrior: () => Promise<void>;
+	showRunWithPrior: boolean;
+} {
 	const updateCell = useSheetStore((state) => state.updateCell);
-	const [isLoading, setIsLoading] = useState(false);
-	const [status, setStatus] = useState<CellStatus>('none');
+	const runningCellId = useSheetStore((state) => state.runningCellId);
+	const setRunningCellId = useSheetStore((state) => state.setRunningCellId);
+	const cells = useSheetStore((state) => state.cells);
+	const status: CellStatus =
+		cellData.result === null
+			? 'none'
+			: cellData.result.kind === 'error'
+				? 'failure'
+				: 'success';
+
+	const isLoading = runningCellId === cellData.id;
+	const anyRunning = runningCellId !== null;
+
+	const idx = cells.findIndex((c) => c.id === cellData.id);
+	const showRunWithPrior = cells.slice(0, idx).some((c) => c.type !== 'markdown');
 
 	const run = useCallback(async () => {
-		setIsLoading(true);
+		if (anyRunning) return;
+		setRunningCellId(cellData.id);
 		try {
-			const result = await execute(cellData);
+			const result = await executeCellData(cellData);
 			updateCell(cellData.id, { ...cellData, result } as CellData);
-			setStatus(result.kind === 'error' ? 'failure' : 'success');
 		} catch (e: unknown) {
 			const message = e instanceof Error ? e.message : String(e);
-			const result: CellResult = { kind: 'error', message };
-			updateCell(cellData.id, { ...cellData, result } as CellData);
-			setStatus('failure');
+			updateCell(cellData.id, { ...cellData, result: { kind: 'error', message } } as CellData);
 		} finally {
-			setIsLoading(false);
+			setRunningCellId(null);
 		}
-	}, [cellData, execute, updateCell]);
+	}, [cellData, anyRunning, updateCell, setRunningCellId]);
 
-	return { isLoading, status, run };
+	const runWithPrior = useCallback(async () => {
+		if (anyRunning) return;
+		const allCells = useSheetStore.getState().cells;
+		const currentIdx = allCells.findIndex((c) => c.id === cellData.id);
+		const toRun = allCells.slice(0, currentIdx + 1).filter((c) => c.type !== 'markdown');
+
+		for (const cell of toRun) {
+			setRunningCellId(cell.id);
+			try {
+				const result = await executeCellData(cell);
+				updateCell(cell.id, { ...cell, result } as CellData);
+			} catch (e: unknown) {
+				const message = e instanceof Error ? e.message : String(e);
+				updateCell(cell.id, { ...cell, result: { kind: 'error', message } } as CellData);
+				setRunningCellId(null);
+				return;
+			}
+		}
+		setRunningCellId(null);
+	}, [cellData, anyRunning, updateCell, setRunningCellId]);
+
+	return { isLoading, anyRunning, status, run, runWithPrior, showRunWithPrior };
 }

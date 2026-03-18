@@ -2,12 +2,11 @@ import { python } from '@codemirror/lang-python';
 import CodeMirror from '@uiw/react-codemirror';
 import { FaPython } from 'react-icons/fa6';
 import { useTheme } from '@/components';
-import { engine } from '@/engine';
 import { useSheetStore } from '@/store';
 import type { CellData } from '@/store/types';
 import { CellOutput } from './CellOutput';
 import styles from './cells.module.css';
-import { ExecutableCellShell, RunButton } from './ExecutableCellShell';
+import { ExecutableCellShell, RunButton, RunWithPriorButton } from './ExecutableCellShell';
 import { usePythonInput } from './usePythonInput';
 import { useRunCell } from './useRunCell';
 
@@ -16,9 +15,8 @@ type PythonCellData = Extract<CellData, { type: 'python' }>;
 export const PythonCell = ({ cellData }: { cellData: PythonCellData }) => {
 	const updateCell = useSheetStore((state) => state.updateCell);
 	const { theme } = useTheme();
-	const { isLoading, status, run } = useRunCell(cellData, (data) =>
-		engine.runPython(data.content),
-	);
+	const { isLoading, anyRunning, status, run, runWithPrior, showRunWithPrior } =
+		useRunCell(cellData);
 	const { transcript, inputPrompt, submitInput } = usePythonInput(
 		isLoading,
 		cellData.result,
@@ -45,13 +43,18 @@ export const PythonCell = ({ cellData }: { cellData: PythonCellData }) => {
 				basicSetup={{ autocompletion: false }}
 				theme={theme}
 				value={cellData.content}
-				editable={!isLoading}
+				editable={!anyRunning}
 				extensions={[python()]}
 				onChange={(code) =>
 					updateCell(cellData.id, { ...cellData, content: code })
 				}
 			/>
-			<RunButton isLoading={isLoading} onClick={run} />
+			<section className={styles.actions}>
+				<RunButton isLoading={isLoading} disabled={anyRunning} onClick={run} />
+				{showRunWithPrior && (
+					<RunWithPriorButton disabled={anyRunning} onClick={runWithPrior} />
+				)}
+			</section>
 			{transcript.length > 0 || inputPrompt != null ? (
 				<section className={styles.transcript}>
 					{transcript.map((item, i) =>

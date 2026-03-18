@@ -2,11 +2,11 @@ import { sql } from '@codemirror/lang-sql';
 import CodeMirror from '@uiw/react-codemirror';
 import { FaDatabase } from 'react-icons/fa6';
 import { useTheme } from '@/components';
-import { engine } from '@/engine';
 import { useSheetStore } from '@/store';
 import type { CellData } from '@/store/types';
 import { CellOutput } from './CellOutput';
-import { ExecutableCellShell, RunButton } from './ExecutableCellShell';
+import styles from './cells.module.css';
+import { ExecutableCellShell, RunButton, RunWithPriorButton } from './ExecutableCellShell';
 import { useRunCell } from './useRunCell';
 
 type SqlCellData = Extract<CellData, { type: 'sql' }>;
@@ -14,9 +14,8 @@ type SqlCellData = Extract<CellData, { type: 'sql' }>;
 export const SqlCell = ({ cellData }: { cellData: SqlCellData }) => {
 	const updateCell = useSheetStore((state) => state.updateCell);
 	const { theme } = useTheme();
-	const { isLoading, status, run } = useRunCell(cellData, (data) =>
-		engine.query(data.content),
-	);
+	const { isLoading, anyRunning, status, run, runWithPrior, showRunWithPrior } =
+		useRunCell(cellData);
 
 	return (
 		<ExecutableCellShell
@@ -30,13 +29,18 @@ export const SqlCell = ({ cellData }: { cellData: SqlCellData }) => {
 				basicSetup={{ autocompletion: false }}
 				theme={theme}
 				value={cellData.content}
-				editable={!isLoading}
+				editable={!anyRunning}
 				extensions={[sql()]}
 				onChange={(code) =>
 					updateCell(cellData.id, { ...cellData, content: code })
 				}
 			/>
-			<RunButton isLoading={isLoading} onClick={run} />
+			<section className={styles.actions}>
+				<RunButton isLoading={isLoading} disabled={anyRunning} onClick={run} />
+				{showRunWithPrior && (
+					<RunWithPriorButton disabled={anyRunning} onClick={runWithPrior} />
+				)}
+			</section>
 			<CellOutput result={cellData.result} />
 		</ExecutableCellShell>
 	);

@@ -1,5 +1,5 @@
 import type { IconType } from 'react-icons';
-import { FaPlay } from 'react-icons/fa6';
+import {  FaForward, FaPlay } from 'react-icons/fa6';
 import styles from './cells.module.css';
 import type { CellStatus } from './types';
 
@@ -35,16 +35,27 @@ export const ExecutableCellShell = ({
 
 interface RunButtonProps {
 	isLoading: boolean;
+	disabled: boolean;
 	onClick: () => void;
 }
 
-export const RunButton = ({ isLoading, onClick }: RunButtonProps) => (
-	<section className={styles.actions}>
-		<button type='button' onClick={onClick} disabled={isLoading}>
-			<FaPlay />
-			<span className={isLoading ? styles.shimmer : undefined}>
-				{isLoading ? 'Running...' : 'Execute snippet'}
-			</span>
-		</button>
-	</section>
+export const RunButton = ({ isLoading, disabled, onClick }: RunButtonProps) => (
+	<button type='button' onClick={onClick} disabled={disabled}>
+		<FaPlay />
+		<span className={isLoading ? styles.shimmer : undefined}>
+			{isLoading ? 'Running...' : 'Run cell'}
+		</span>
+	</button>
+);
+
+interface RunWithPriorButtonProps {
+	disabled: boolean;
+	onClick: () => void;
+}
+
+export const RunWithPriorButton = ({ disabled, onClick }: RunWithPriorButtonProps) => (
+	<button type='button' onClick={onClick} disabled={disabled}>
+		<FaForward />
+		<span>Run to here</span>
+	</button>
 );

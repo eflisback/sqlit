@@ -7,6 +7,8 @@ interface SheetStore {
 	insertCell: (cellData: CellData, index: number) => void;
 	updateCell: (id: string, cellData: CellData) => void;
 	removeCell: (id: string) => void;
+	runningCellId: string | null;
+	setRunningCellId: (id: string | null) => void;
 }
 
 export const useSheetStore = create<SheetStore>()((set) => ({
@@ -53,4 +55,6 @@ export const useSheetStore = create<SheetStore>()((set) => ({
 		set((prev) => ({
 			cells: prev.cells.filter((cellData) => cellData.id !== id),
 		})),
+	runningCellId: null,
+	setRunningCellId: (id) => set({ runningCellId: id }),
 }));

@@ -4,7 +4,7 @@
 	gap: 15px;
 	width: 100%;
 	height: fit-content;
-	padding: 10px 30px;
+	padding: 20px 30px;
 	border-left: 5px solid var(--border);
 }
 
@@ -53,6 +53,13 @@
 	flex-direction: row;
 	align-items: center;
 	gap: 10px;
+}
+
+.actions {
+	display: flex;
+	flex-direction: row;
+	gap: 8px;
+	align-items: center;
 }
 
 .actions button {
