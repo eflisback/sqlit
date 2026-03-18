@@ -1,2 +1,2 @@
-export type { CellData } from './types';
+export type { CellData, CellResult } from './types';
 export { useSheetStore } from './useSheetStore';

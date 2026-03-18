@@ -1,30 +1,51 @@
 import type { Database, Sqlite3Static } from '@sqliteai/sqlite-wasm';
 import sqlite3InitModule from '@sqliteai/sqlite-wasm';
 import { expose } from 'comlink';
-import type { SqlResult } from './types';
+import { loadPyodide, type PyodideAPI } from 'pyodide';
+import type { CellResult } from '@/store/types';
 
 let sqlite3: Sqlite3Static | null = null;
 let db: Database | null = null;
+let py: PyodideAPI | null = null;
 
-const getDb = async () => {
-	if (!db) {
+const getSqlite3 = async (): Promise<Sqlite3Static> => {
+	if (!sqlite3) {
 		sqlite3 = await sqlite3InitModule();
-		db = new sqlite3.oo1.DB(':memory:');
 	}
-	return db;
+	return sqlite3;
+};
+
+const getDb = async (): Promise<[Database, Sqlite3Static]> => {
+	const s3 = await getSqlite3();
+	if (!db) {
+		db = new s3.oo1.DB(':memory:');
+	}
+	return [db, s3];
+};
+
+const getPy = async () => {
+	if (!py) {
+		py = await loadPyodide({ indexURL: '/pyodide/' });
+		await py.loadPackage('micropip');
+		await py.runPythonAsync(
+			'import micropip; await micropip.install("sqlite3")',
+		);
+	}
+	return py;
 };
 
 export const engine = {
-	query: async (sql: string): Promise<SqlResult> => {
-		const db = await getDb();
-		const rows = db.exec(sql, { rowMode: 'object', returnValue: 'resultRows' });
-		const rowsAffected = db.changes();
-		return { rows, rowsAffected };
+	query: async (sql: string): Promise<CellResult> => {
+		const [currentDb] = await getDb();
+		const rows = currentDb.exec(sql, {
+			rowMode: 'object',
+			returnValue: 'resultRows',
+		});
+		const rowsAffected = currentDb.changes();
+		return { kind: 'table', rows, rowsAffected };
 	},
 	loadFromUrl: async (url: string): Promise<void> => {
-		if (!sqlite3) {
-			sqlite3 = await sqlite3InitModule();
-		}
+		const s3 = await getSqlite3();
 		const response = await fetch(url);
 		if (!response.ok) {
 			throw new Error(
@@ -44,22 +65,63 @@ export const engine = {
 			db = null;
 		}
 
-		const newDb = new sqlite3.oo1.DB(':memory:');
-		const p = sqlite3.wasm.allocFromTypedArray(bytes);
-		const rc = sqlite3.capi.sqlite3_deserialize(
+		const newDb = new s3.oo1.DB(':memory:');
+		const p = s3.wasm.allocFromTypedArray(bytes);
+		const rc = s3.capi.sqlite3_deserialize(
 			newDb,
 			'main',
 			p,
 			bytes.byteLength,
 			bytes.byteLength,
-			sqlite3.capi.SQLITE_DESERIALIZE_FREEONCLOSE |
-				sqlite3.capi.SQLITE_DESERIALIZE_RESIZEABLE,
+			s3.capi.SQLITE_DESERIALIZE_FREEONCLOSE |
+				s3.capi.SQLITE_DESERIALIZE_RESIZEABLE,
 		);
 		if (rc !== 0) {
 			newDb.close();
 			throw new Error(`Failed to deserialize database (code ${rc})!`);
 		}
 		db = newDb;
+	},
+	runPython: async (code: string): Promise<CellResult> => {
+		const [currentDb, s3] = await getDb();
+		const pyodide = await getPy();
+
+		// Sync SQLite with Pyodide VFS so Python can access the live database
+		const dbBytes = s3.capi.sqlite3_js_db_export(currentDb);
+		pyodide.FS.writeFile('/sqliteler.db', dbBytes);
+
+		try {
+			pyodide.runPython(
+				'import sys, io; sys.stdout = io.StringIO(); sys.stderr = sys.stdout',
+			);
+			await pyodide.runPythonAsync(code);
+			const output = pyodide.runPython('sys.stdout.getvalue()') as string;
+
+			// Sync Pyodide VFS with SQLite in case Python mutated the database
+			const updated = pyodide.FS.readFile('/sqliteler.db') as Uint8Array;
+			const p = s3.wasm.allocFromTypedArray(updated);
+			s3.capi.sqlite3_deserialize(
+				currentDb,
+				'main',
+				p,
+				updated.byteLength,
+				updated.byteLength,
+				s3.capi.SQLITE_DESERIALIZE_FREEONCLOSE |
+					s3.capi.SQLITE_DESERIALIZE_RESIZEABLE,
+			);
+			db = currentDb;
+
+			return { kind: 'text', text: output || '(no output)' };
+		} catch (e) {
+			let stdout = '';
+			try {
+				stdout = pyodide.runPython('sys.stdout.getvalue()') as string;
+			} catch {
+				/* stdout not set up */
+			}
+			const trace = e instanceof Error ? e.message : String(e);
+			return { kind: 'error', message: stdout ? `${stdout}\n${trace}` : trace };
+		}
 	},
 };
 

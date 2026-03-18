@@ -4,9 +4,7 @@
 	gap: 15px;
 	width: 100%;
 	height: fit-content;
-	background-color: var(--bg-cell);
 	padding: 30px;
-	border-radius: 8px;
 	border-left: 5px solid var(--border);
 }
 
