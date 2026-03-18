@@ -5,6 +5,7 @@ import styles from './cells.module.css';
 import { cellDefinitions } from './registry';
 import type { CellDefinition } from './types';
 import { useRunCell } from './useRunCell';
+import { usePythonInput } from './usePythonInput';
 
 interface CellProps {
 	cellData: CellData;
@@ -24,6 +25,11 @@ const CellBody = <T extends CellData>({
 	const isEditMode = useSheetStore((state) => state.isEditMode);
 	const { isLoading, status, run } = useRunCell(cellData, definition);
 	const { Icon, label, information, execute, Editor } = definition;
+	const isPython = cellData.type === 'python';
+	const { transcript, inputPrompt, submitInput: handleSubmitInput } = usePythonInput(
+		isLoading && isPython,
+		isPython ? cellData.result : undefined,
+	);
 
 	const onChange = (patch: Partial<Omit<T, 'id' | 'type'>>) => {
 		updateCell(cellData.id, { ...cellData, ...patch } as CellData);
@@ -59,7 +65,12 @@ const CellBody = <T extends CellData>({
 					</button>
 				</section>
 			)}
-			<CellOutput result={cellData.result} />
+			<CellOutput
+				result={cellData.result}
+				transcript={isPython ? transcript : undefined}
+				inputPrompt={isPython ? inputPrompt : undefined}
+				onSubmitInput={isPython ? handleSubmitInput : undefined}
+			/>
 		</article>
 	);
 };

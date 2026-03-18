@@ -118,3 +118,64 @@
 	/* biome-ignore lint/complexity/noImportantStyles: Override default CodeMirror styling */
 	outline: none !important;
 }
+
+.input-form {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 8px;
+	font-size: 0.875rem;
+	font-family: monospace;
+}
+
+.input-prompt {
+	color: var(--text-secondary);
+	white-space: pre;
+}
+
+.input-field {
+	flex: 1;
+	padding: 4px 8px;
+	background-color: var(--bg-page);
+	color: var(--text-primary);
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	font-family: monospace;
+	font-size: 0.875rem;
+}
+
+.input-form button {
+	padding: 4px 10px;
+	background-color: var(--bg-page);
+	color: var(--text-secondary);
+	border-radius: 6px;
+	font-size: 0.875rem;
+}
+
+.input-form button:hover {
+	color: var(--text-primary);
+}
+
+.transcript {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	font-family: monospace;
+	font-size: 0.875rem;
+}
+
+.transcript-output {
+	margin: 0;
+	color: var(--text-primary);
+	white-space: pre-wrap;
+}
+
+.transcript-input {
+	margin: 0;
+	color: var(--text-secondary);
+	white-space: pre;
+}
+
+.transcript-input span {
+	color: var(--text-primary);
+}

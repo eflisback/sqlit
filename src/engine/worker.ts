@@ -7,6 +7,12 @@ import type { CellResult } from '@/store/types';
 let sqlite3: Sqlite3Static | null = null;
 let db: Database | null = null;
 let py: PyodideAPI | null = null;
+let inputBuffer: SharedArrayBuffer | null = null;
+
+const INPUT_OVERRIDE_PY = `import builtins, js
+def _input(prompt=''):
+    return js.requestInput(str(prompt))
+builtins.input = _input`;
 
 const getSqlite3 = async (): Promise<Sqlite3Static> => {
 	if (!sqlite3) {
@@ -35,6 +41,36 @@ const getPy = async () => {
 };
 
 export const engine = {
+	initInputBuffer: (sab: SharedArrayBuffer): void => {
+		inputBuffer = sab;
+		const statusView = new Int32Array(sab, 0, 2);
+		const promptBytes = new Uint8Array(sab, 8, 4096);
+		const stdoutLenView = new Int32Array(sab, 4104, 1);
+		const stdoutBytes = new Uint8Array(sab, 4108, 32768);
+		const responseLenView = new Int32Array(sab, 36876, 1);
+		const responseBytes = new Uint8Array(sab, 36880, 4096);
+		const encoder = new TextEncoder();
+		const decoder = new TextDecoder();
+		(globalThis as unknown as Record<string, unknown>).requestInput = (
+			prompt: string,
+		): string => {
+			// Flush current stdout into SAB before signalling the main thread
+			const stdoutVal = py!.runPython('sys.stdout.getvalue()') as string;
+			py!.runPython('sys.stdout = io.StringIO(); sys.stderr = sys.stdout');
+			const stdoutEncoded = encoder.encode(stdoutVal);
+			stdoutBytes.set(stdoutEncoded.subarray(0, 32768));
+			stdoutLenView[0] = Math.min(stdoutEncoded.length, 32768);
+
+			const encoded = encoder.encode(prompt);
+			promptBytes.set(encoded.subarray(0, 4096));
+			statusView[1] = Math.min(encoded.length, 4096);
+			Atomics.store(statusView, 0, 1);
+			Atomics.notify(statusView, 0);
+			Atomics.wait(statusView, 0, 1);
+			const responseLen = responseLenView[0];
+			return decoder.decode(responseBytes.slice(0, responseLen));
+		};
+	},
 	query: async (sql: string): Promise<CellResult> => {
 		const [currentDb] = await getDb();
 		const rows = currentDb.exec(sql, {
@@ -94,6 +130,9 @@ export const engine = {
 			pyodide.runPython(
 				'import sys, io; sys.stdout = io.StringIO(); sys.stderr = sys.stdout',
 			);
+			if (inputBuffer) {
+				pyodide.runPython(INPUT_OVERRIDE_PY);
+			}
 			await pyodide.runPythonAsync(code);
 			const output = pyodide.runPython('sys.stdout.getvalue()') as string;
 
