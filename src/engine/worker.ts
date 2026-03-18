@@ -88,7 +88,7 @@ export const engine = {
 
 		// Sync SQLite with Pyodide VFS so Python can access the live database
 		const dbBytes = s3.capi.sqlite3_js_db_export(currentDb);
-		pyodide.FS.writeFile('/sqliteler.db', dbBytes);
+		pyodide.FS.writeFile('/memory.db', dbBytes);
 
 		try {
 			pyodide.runPython(
@@ -98,7 +98,7 @@ export const engine = {
 			const output = pyodide.runPython('sys.stdout.getvalue()') as string;
 
 			// Sync Pyodide VFS with SQLite in case Python mutated the database
-			const updated = pyodide.FS.readFile('/sqliteler.db') as Uint8Array;
+			const updated = pyodide.FS.readFile('/memory.db') as Uint8Array;
 			const p = s3.wasm.allocFromTypedArray(updated);
 			s3.capi.sqlite3_deserialize(
 				currentDb,

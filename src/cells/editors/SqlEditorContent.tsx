@@ -6,7 +6,11 @@ import type { EditorProps } from '../types';
 
 type SqlCell = Extract<CellData, { type: 'sql' }>;
 
-export const SqlEditorContent = ({ cellData, isLoading, onChange }: EditorProps<SqlCell>) => {
+export const SqlEditorContent = ({
+	cellData,
+	isLoading,
+	onChange,
+}: EditorProps<SqlCell>) => {
 	const { theme } = useTheme();
 	return (
 		<CodeMirror

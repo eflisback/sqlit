@@ -1,2 +1,3 @@
 export { Cell } from '@/cells';
-export { ThemeProvider, useTheme } from './theme/ThemeProvider.tsx';
+export { ThemeProvider } from './theme/ThemeProvider.tsx';
+export { useTheme } from './theme/useTheme';

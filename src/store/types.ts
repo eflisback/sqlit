@@ -1,7 +1,11 @@
 import type { SqlValue } from '@sqliteai/sqlite-wasm';
 
 export type CellResult =
-	| { kind: 'table'; rows: { [columnName: string]: SqlValue }[]; rowsAffected: number }
+	| {
+			kind: 'table';
+			rows: { [columnName: string]: SqlValue }[];
+			rowsAffected: number;
+	  }
 	| { kind: 'text'; text: string }
 	| { kind: 'error'; message: string };
 

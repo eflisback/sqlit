@@ -1,10 +1,10 @@
 import { FaPlay, FaTrash } from 'react-icons/fa6';
 import { type CellData, useSheetStore } from '@/store';
 import { CellOutput } from './CellOutput';
+import styles from './cells.module.css';
 import { cellDefinitions } from './registry';
 import type { CellDefinition } from './types';
 import { useRunCell } from './useRunCell';
-import styles from './cells.module.css';
 
 interface CellProps {
 	cellData: CellData;
@@ -15,7 +15,10 @@ interface CellBodyProps<T extends CellData> {
 	definition: CellDefinition<T>;
 }
 
-const CellBody = <T extends CellData>({ cellData, definition }: CellBodyProps<T>) => {
+const CellBody = <T extends CellData>({
+	cellData,
+	definition,
+}: CellBodyProps<T>) => {
 	const removeCell = useSheetStore((state) => state.removeCell);
 	const updateCell = useSheetStore((state) => state.updateCell);
 	const isEditMode = useSheetStore((state) => state.isEditMode);
@@ -27,11 +30,15 @@ const CellBody = <T extends CellData>({ cellData, definition }: CellBodyProps<T>
 	};
 
 	return (
-		<article className={`${styles.cell} ${styles[status]}`}>
+		<article
+			className={`${styles.cell} ${isLoading ? styles.loading : styles[status]}`}
+		>
 			<header>
 				<section title={information}>
 					<Icon />
-					<span>{label}</span>
+					<span className={isLoading ? styles.shimmer : undefined}>
+						{label}
+					</span>
 				</section>
 				<section>
 					{isEditMode && (
@@ -46,7 +53,9 @@ const CellBody = <T extends CellData>({ cellData, definition }: CellBodyProps<T>
 				<section className={styles.actions}>
 					<button type='button' onClick={run} disabled={isLoading}>
 						<FaPlay />
-						<span>{isLoading ? 'Running...' : 'Execute snippet'}</span>
+						<span className={isLoading ? styles.shimmer : undefined}>
+							{isLoading ? 'Running...' : 'Execute snippet'}
+						</span>
 					</button>
 				</section>
 			)}
@@ -60,9 +69,13 @@ export const Cell = ({ cellData }: CellProps) => {
 		case 'sql':
 			return <CellBody cellData={cellData} definition={cellDefinitions.sql} />;
 		case 'python':
-			return <CellBody cellData={cellData} definition={cellDefinitions.python} />;
+			return (
+				<CellBody cellData={cellData} definition={cellDefinitions.python} />
+			);
 		case 'markdown':
-			return <CellBody cellData={cellData} definition={cellDefinitions.markdown} />;
+			return (
+				<CellBody cellData={cellData} definition={cellDefinitions.markdown} />
+			);
 		case 'load':
 			return <CellBody cellData={cellData} definition={cellDefinitions.load} />;
 	}

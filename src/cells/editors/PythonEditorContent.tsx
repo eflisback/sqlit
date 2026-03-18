@@ -6,7 +6,11 @@ import type { EditorProps } from '../types';
 
 type PythonCell = Extract<CellData, { type: 'python' }>;
 
-export const PythonEditorContent = ({ cellData, isLoading, onChange }: EditorProps<PythonCell>) => {
+export const PythonEditorContent = ({
+	cellData,
+	isLoading,
+	onChange,
+}: EditorProps<PythonCell>) => {
 	const { theme } = useTheme();
 	return (
 		<CodeMirror

@@ -16,6 +16,29 @@
 	border-color: var(--color-failure);
 }
 
+.loading .shimmer {
+	background: linear-gradient(
+		90deg,
+		var(--text-secondary) 0%,
+		var(--color-loading) 50%,
+		var(--text-secondary) 100%
+	);
+	background-size: 200% 100%;
+	background-clip: text;
+	-webkit-background-clip: text;
+	color: transparent;
+	animation: text-shimmer 1s linear infinite;
+}
+
+@keyframes text-shimmer {
+	from {
+		background-position: 100% 0;
+	}
+	to {
+		background-position: -100% 0;
+	}
+}
+
 .cell header {
 	display: flex;
 	flex-direction: row;
