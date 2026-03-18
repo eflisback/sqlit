@@ -5,7 +5,9 @@ h4,
 h5,
 h6,
 p,
-pre {
+pre,
+ul,
+ol {
 	margin: unset;
 }
 
