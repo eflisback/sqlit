@@ -9,8 +9,23 @@ interface ThemeContextValue {
 
 export const ThemeContext = createContext<ThemeContextValue | null>(null);
 
+const STORAGE_KEY = 'sqliteler-theme';
+
+function getInitialTheme(): Theme {
+	const stored = localStorage.getItem(STORAGE_KEY);
+	if (stored === 'light' || stored === 'dark') return stored;
+	return window.matchMedia('(prefers-color-scheme: dark)').matches
+		? 'dark'
+		: 'light';
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-	const [theme, setTheme] = useState<Theme>('light');
+	const [theme, setThemeState] = useState<Theme>(getInitialTheme);
+
+	const setTheme = (next: Theme) => {
+		localStorage.setItem(STORAGE_KEY, next);
+		setThemeState(next);
+	};
 
 	useEffect(() => {
 		document.documentElement.setAttribute('data-theme', theme);

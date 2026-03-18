@@ -1,93 +1,18 @@
-import { FaPlay, FaTrash } from 'react-icons/fa6';
-import { type CellData, useSheetStore } from '@/store';
-import { CellOutput } from './CellOutput';
-import styles from './cells.module.css';
-import { cellDefinitions } from './registry';
-import type { CellDefinition } from './types';
-import { useRunCell } from './useRunCell';
-import { usePythonInput } from './usePythonInput';
+import type { CellData } from '@/store/types';
+import { LoadCell } from './LoadCell';
+import { MarkdownCell } from './MarkdownCell';
+import { PythonCell } from './PythonCell';
+import { SqlCell } from './SqlCell';
 
-interface CellProps {
-	cellData: CellData;
-}
-
-interface CellBodyProps<T extends CellData> {
-	cellData: T;
-	definition: CellDefinition<T>;
-}
-
-const CellBody = <T extends CellData>({
-	cellData,
-	definition,
-}: CellBodyProps<T>) => {
-	const removeCell = useSheetStore((state) => state.removeCell);
-	const updateCell = useSheetStore((state) => state.updateCell);
-	const isEditMode = useSheetStore((state) => state.isEditMode);
-	const { isLoading, status, run } = useRunCell(cellData, definition);
-	const { Icon, label, information, execute, Editor } = definition;
-	const isPython = cellData.type === 'python';
-	const { transcript, inputPrompt, submitInput: handleSubmitInput } = usePythonInput(
-		isLoading && isPython,
-		isPython ? cellData.result : undefined,
-	);
-
-	const onChange = (patch: Partial<Omit<T, 'id' | 'type'>>) => {
-		updateCell(cellData.id, { ...cellData, ...patch } as CellData);
-	};
-
-	return (
-		<article
-			className={`${styles.cell} ${isLoading ? styles.loading : styles[status]}`}
-		>
-			<header>
-				<section title={information}>
-					<Icon />
-					<span className={isLoading ? styles.shimmer : undefined}>
-						{label}
-					</span>
-				</section>
-				<section>
-					{isEditMode && (
-						<button type='button' onClick={() => removeCell(cellData.id)}>
-							<FaTrash />
-						</button>
-					)}
-				</section>
-			</header>
-			<Editor cellData={cellData} isLoading={isLoading} onChange={onChange} />
-			{execute !== null && (
-				<section className={styles.actions}>
-					<button type='button' onClick={run} disabled={isLoading}>
-						<FaPlay />
-						<span className={isLoading ? styles.shimmer : undefined}>
-							{isLoading ? 'Running...' : 'Execute snippet'}
-						</span>
-					</button>
-				</section>
-			)}
-			<CellOutput
-				result={cellData.result}
-				transcript={isPython ? transcript : undefined}
-				inputPrompt={isPython ? inputPrompt : undefined}
-				onSubmitInput={isPython ? handleSubmitInput : undefined}
-			/>
-		</article>
-	);
-};
-
-export const Cell = ({ cellData }: CellProps) => {
+export const Cell = ({ cellData }: { cellData: CellData }) => {
 	switch (cellData.type) {
 		case 'sql':
-			return <CellBody cellData={cellData} definition={cellDefinitions.sql} />;
+			return <SqlCell cellData={cellData} />;
 		case 'python':
-			return (
-				<CellBody cellData={cellData} definition={cellDefinitions.python} />
-			);
+			return <PythonCell cellData={cellData} />;
 		case 'markdown':
-			return (
-				<CellBody cellData={cellData} definition={cellDefinitions.markdown} />
-			);
+			return <MarkdownCell cellData={cellData} />;
 		case 'load':
-			return <CellBody cellData={cellData} definition={cellDefinitions.load} />;
+			return <LoadCell cellData={cellData} />;
 	}
 };

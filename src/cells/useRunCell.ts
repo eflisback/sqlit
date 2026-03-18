@@ -1,28 +1,20 @@
 import { useCallback, useState } from 'react';
 import { useSheetStore } from '@/store';
 import type { CellData, CellResult } from '@/store/types';
-import type { CellDefinition, CellStatus } from './types';
-
-interface RunCellState {
-	isLoading: boolean;
-	status: CellStatus;
-	run: () => Promise<void>;
-}
+import type { CellStatus } from './types';
 
 export function useRunCell<T extends CellData>(
 	cellData: T,
-	definition: CellDefinition<T>,
-): RunCellState {
+	execute: (cellData: T) => Promise<CellResult>,
+): { isLoading: boolean; status: CellStatus; run: () => Promise<void> } {
 	const updateCell = useSheetStore((state) => state.updateCell);
 	const [isLoading, setIsLoading] = useState(false);
 	const [status, setStatus] = useState<CellStatus>('none');
 
 	const run = useCallback(async () => {
-		if (!definition.execute) return;
-
 		setIsLoading(true);
 		try {
-			const result = await definition.execute(cellData);
+			const result = await execute(cellData);
 			updateCell(cellData.id, { ...cellData, result } as CellData);
 			setStatus(result.kind === 'error' ? 'failure' : 'success');
 		} catch (e: unknown) {
@@ -33,7 +25,7 @@ export function useRunCell<T extends CellData>(
 		} finally {
 			setIsLoading(false);
 		}
-	}, [cellData, definition, updateCell]);
+	}, [cellData, execute, updateCell]);
 
 	return { isLoading, status, run };
 }

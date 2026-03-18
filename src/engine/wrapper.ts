@@ -15,23 +15,37 @@ const decoder = new TextDecoder();
 engine.initInputBuffer(inputSAB);
 
 type WaitAsyncResult = { value: Promise<'ok' | 'not-equal' | 'timed-out'> };
-const waitAsync = (view: Int32Array, index: number, value: number): WaitAsyncResult =>
+const waitAsync = (
+	view: Int32Array,
+	index: number,
+	value: number,
+): WaitAsyncResult =>
 	(
 		Atomics as unknown as {
-			waitAsync: (view: Int32Array, index: number, value: number) => WaitAsyncResult;
+			waitAsync: (
+				view: Int32Array,
+				index: number,
+				value: number,
+			) => WaitAsyncResult;
 		}
 	).waitAsync(view, index, value);
 
-export function onInputRequest(cb: (stdout: string, prompt: string) => void): () => void {
+export function onInputRequest(
+	cb: (stdout: string, prompt: string) => void,
+): () => void {
 	let cancelled = false;
 	const loop = async () => {
 		while (!cancelled) {
 			await waitAsync(statusView, 0, 0).value;
 			if (cancelled) break;
 			const stdoutLen = new Int32Array(inputSAB, 4104, 1)[0];
-			const stdout = decoder.decode(new Uint8Array(inputSAB, 4108, stdoutLen).slice());
+			const stdout = decoder.decode(
+				new Uint8Array(inputSAB, 4108, stdoutLen).slice(),
+			);
 			const promptLen = statusView[1];
-			const prompt = decoder.decode(new Uint8Array(inputSAB, 8, promptLen).slice());
+			const prompt = decoder.decode(
+				new Uint8Array(inputSAB, 8, promptLen).slice(),
+			);
 			cb(stdout, prompt);
 			await waitAsync(statusView, 0, 1).value;
 		}

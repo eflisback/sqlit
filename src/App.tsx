@@ -1,10 +1,7 @@
-import { LandingScreen, Sheet } from './pages';
-import { useSheetStore } from './store';
+import { Sheet } from './pages';
 
 function App() {
-	const hasStarted = useSheetStore((state) => state.hasStarted);
-
-	return hasStarted ? <Sheet /> : <LandingScreen />;
+	return <Sheet />;
 }
 
 export default App;

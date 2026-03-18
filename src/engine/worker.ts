@@ -55,8 +55,9 @@ export const engine = {
 			prompt: string,
 		): string => {
 			// Flush current stdout into SAB before signalling the main thread
-			const stdoutVal = py!.runPython('sys.stdout.getvalue()') as string;
-			py!.runPython('sys.stdout = io.StringIO(); sys.stderr = sys.stdout');
+			if (!py) return '';
+			const stdoutVal = py.runPython('sys.stdout.getvalue()') as string;
+			py.runPython('sys.stdout = io.StringIO(); sys.stderr = sys.stdout');
 			const stdoutEncoded = encoder.encode(stdoutVal);
 			stdoutBytes.set(stdoutEncoded.subarray(0, 32768));
 			stdoutLenView[0] = Math.min(stdoutEncoded.length, 32768);
