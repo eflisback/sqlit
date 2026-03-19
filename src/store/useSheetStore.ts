@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { isExecutableCellData } from './types';
 import type { CellData } from './types';
 import welcomeCell from './welcome-cell.md?raw';
 
@@ -8,8 +9,11 @@ interface SheetStore {
 	insertCell: (cellData: CellData, index: number) => void;
 	updateCell: (id: string, cellData: CellData) => void;
 	removeCell: (id: string) => void;
+	moveCell: (id: string, direction: 'up' | 'down') => void;
 	runningCellId: string | null;
 	setRunningCellId: (id: string | null) => void;
+	isEditable: boolean;
+	setIsEditable: (isEditable: boolean) => void;
 }
 
 export const useSheetStore = create<SheetStore>()(
@@ -20,7 +24,6 @@ export const useSheetStore = create<SheetStore>()(
 					id: 'welcome-markdown',
 					type: 'markdown',
 					content: welcomeCell,
-					result: null,
 				},
 				{
 					id: 'welcome-load',
@@ -58,13 +61,26 @@ export const useSheetStore = create<SheetStore>()(
 				set((prev) => ({
 					cells: prev.cells.filter((cellData) => cellData.id !== id),
 				})),
+			moveCell: (id, direction) =>
+				set((state) => {
+					const idx = state.cells.findIndex((c) => c.id === id);
+					const swap = direction === 'up' ? idx - 1 : idx + 1;
+					if (swap < 0 || swap >= state.cells.length) return state;
+					const cells = [...state.cells];
+					[cells[idx], cells[swap]] = [cells[swap], cells[idx]];
+					return { cells };
+				}),
 			runningCellId: null,
 			setRunningCellId: (id) => set({ runningCellId: id }),
+			isEditable: false,
+			setIsEditable: (isEditable) => set({ isEditable }),
 		}),
 		{
 			name: 'sheet',
 			partialize: (state) => ({
-				cells: state.cells.map((cell) => ({ ...cell, result: null })),
+				cells: state.cells.map((cell): CellData =>
+					isExecutableCellData(cell) ? { ...cell, result: null } : cell
+				),
 			}),
 		},
 	),

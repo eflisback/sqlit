@@ -1,10 +1,11 @@
 import { useCallback } from 'react';
 import { useSheetStore } from '@/store';
-import type { CellData } from '@/store/types';
+import type { CellData, ExecutableCellData } from '@/store/types';
+import { isExecutableCellData } from '@/store/types';
 import { executeCellData } from './executeCellData';
 import type { CellStatus } from './types';
 
-export function useRunCell(cellData: CellData): {
+export function useRunCell(cellData: ExecutableCellData): {
 	isLoading: boolean;
 	anyRunning: boolean;
 	status: CellStatus;
@@ -27,9 +28,7 @@ export function useRunCell(cellData: CellData): {
 	const anyRunning = runningCellId !== null;
 
 	const idx = cells.findIndex((c) => c.id === cellData.id);
-	const showRunWithPrior = cells
-		.slice(0, idx)
-		.some((c) => c.type !== 'markdown');
+	const showRunWithPrior = cells.slice(0, idx).some(isExecutableCellData);
 
 	const run = useCallback(async () => {
 		if (anyRunning) return;
@@ -54,7 +53,7 @@ export function useRunCell(cellData: CellData): {
 		const currentIdx = allCells.findIndex((c) => c.id === cellData.id);
 		const toRun = allCells
 			.slice(0, currentIdx + 1)
-			.filter((c) => c.type !== 'markdown');
+			.filter(isExecutableCellData);
 
 		for (const cell of toRun) {
 			setRunningCellId(cell.id);

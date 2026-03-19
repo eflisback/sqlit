@@ -1,26 +1,19 @@
 import { python } from '@codemirror/lang-python';
 import CodeMirror from '@uiw/react-codemirror';
-import { FaPython } from 'react-icons/fa6';
 import { useTheme } from '@/components';
 import { useSheetStore } from '@/store';
-import type { CellData } from '@/store/types';
+import type { PythonCellData } from '@/store/types';
 import { CellOutput } from './CellOutput';
 import styles from './cells.module.css';
-import {
-	ExecutableCellShell,
-	RunButton,
-	RunWithPriorButton,
-} from './ExecutableCellShell';
 import { usePythonInput } from './usePythonInput';
-import { useRunCell } from './useRunCell';
-
-type PythonCellData = Extract<CellData, { type: 'python' }>;
 
 export const PythonCell = ({ cellData }: { cellData: PythonCellData }) => {
 	const updateCell = useSheetStore((state) => state.updateCell);
+	const isLoading = useSheetStore(
+		(state) => state.runningCellId === cellData.id,
+	);
+	const anyRunning = useSheetStore((state) => state.runningCellId !== null);
 	const { theme } = useTheme();
-	const { isLoading, anyRunning, status, run, runWithPrior, showRunWithPrior } =
-		useRunCell(cellData);
 	const { transcript, inputPrompt, submitInput } = usePythonInput(
 		isLoading,
 		cellData.result,
@@ -36,13 +29,7 @@ export const PythonCell = ({ cellData }: { cellData: PythonCellData }) => {
 	};
 
 	return (
-		<ExecutableCellShell
-			Icon={FaPython}
-			label='python'
-			information='Contains Python code executed via Pyodide with access to the SQLite database.'
-			isLoading={isLoading}
-			status={status}
-		>
+		<>
 			<CodeMirror
 				basicSetup={{ autocompletion: false }}
 				theme={theme}
@@ -53,12 +40,6 @@ export const PythonCell = ({ cellData }: { cellData: PythonCellData }) => {
 					updateCell(cellData.id, { ...cellData, content: code })
 				}
 			/>
-			<section className={styles.actions}>
-				<RunButton isLoading={isLoading} disabled={anyRunning} onClick={run} />
-				{showRunWithPrior && (
-					<RunWithPriorButton disabled={anyRunning} onClick={runWithPrior} />
-				)}
-			</section>
 			{transcript.length > 0 || inputPrompt != null ? (
 				<section className={styles.transcript}>
 					{transcript.map((item, i) =>
@@ -95,6 +76,6 @@ export const PythonCell = ({ cellData }: { cellData: PythonCellData }) => {
 			) : (
 				<CellOutput result={cellData.result} />
 			)}
-		</ExecutableCellShell>
+		</>
 	);
 };

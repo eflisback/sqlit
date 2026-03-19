@@ -10,8 +10,13 @@ export const Sheet = () => {
 		<>
 			<Header />
 			<main className={styles.sheet}>
-				{cells.map((cellData) => (
-					<Cell key={cellData.id} cellData={cellData} />
+				{cells.map((cellData, i) => (
+					<Cell
+						key={cellData.id}
+						cellData={cellData}
+						isFirst={i === 0}
+						isLast={i === cells.length - 1}
+					/>
 				))}
 			</main>
 		</>

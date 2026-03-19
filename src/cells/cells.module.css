@@ -48,11 +48,16 @@
 	color: var(--text-secondary);
 }
 
-.cell header section {
+.information,
+.edit-buttons {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
 	gap: 10px;
+}
+
+.edit-buttons {
+	gap: 15px;
 }
 
 .actions {
