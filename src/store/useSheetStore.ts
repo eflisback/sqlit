@@ -78,8 +78,9 @@ export const useSheetStore = create<SheetStore>()(
 		{
 			name: 'sheet',
 			partialize: (state) => ({
-				cells: state.cells.map((cell): CellData =>
-					isExecutableCellData(cell) ? { ...cell, result: null } : cell
+				cells: state.cells.map(
+					(cell): CellData =>
+						isExecutableCellData(cell) ? { ...cell, result: null } : cell,
 				),
 			}),
 		},

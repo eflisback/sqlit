@@ -3,9 +3,7 @@
 	justify-content: flex-end;
 	margin: 0 20vw;
 	gap: 15px;
-	padding-left: 30px;
-	padding-right: 30px;
-	padding-top: 30px;
+	padding: 20px 30px;
 	background-color: var(--bg-cell);
 	border-left: 5px solid var(--border);
 }
