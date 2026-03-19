@@ -1,5 +1,5 @@
 import type { IconType } from 'react-icons';
-import {  FaForward, FaPlay } from 'react-icons/fa6';
+import { FaForward, FaPlay } from 'react-icons/fa6';
 import styles from './cells.module.css';
 import type { CellStatus } from './types';
 
@@ -53,7 +53,10 @@ interface RunWithPriorButtonProps {
 	onClick: () => void;
 }
 
-export const RunWithPriorButton = ({ disabled, onClick }: RunWithPriorButtonProps) => (
+export const RunWithPriorButton = ({
+	disabled,
+	onClick,
+}: RunWithPriorButtonProps) => (
 	<button type='button' onClick={onClick} disabled={disabled}>
 		<FaForward />
 		<span>Run to here</span>

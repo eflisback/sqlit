@@ -27,7 +27,9 @@ export function useRunCell(cellData: CellData): {
 	const anyRunning = runningCellId !== null;
 
 	const idx = cells.findIndex((c) => c.id === cellData.id);
-	const showRunWithPrior = cells.slice(0, idx).some((c) => c.type !== 'markdown');
+	const showRunWithPrior = cells
+		.slice(0, idx)
+		.some((c) => c.type !== 'markdown');
 
 	const run = useCallback(async () => {
 		if (anyRunning) return;
@@ -37,7 +39,10 @@ export function useRunCell(cellData: CellData): {
 			updateCell(cellData.id, { ...cellData, result } as CellData);
 		} catch (e: unknown) {
 			const message = e instanceof Error ? e.message : String(e);
-			updateCell(cellData.id, { ...cellData, result: { kind: 'error', message } } as CellData);
+			updateCell(cellData.id, {
+				...cellData,
+				result: { kind: 'error', message },
+			} as CellData);
 		} finally {
 			setRunningCellId(null);
 		}
@@ -47,7 +52,9 @@ export function useRunCell(cellData: CellData): {
 		if (anyRunning) return;
 		const allCells = useSheetStore.getState().cells;
 		const currentIdx = allCells.findIndex((c) => c.id === cellData.id);
-		const toRun = allCells.slice(0, currentIdx + 1).filter((c) => c.type !== 'markdown');
+		const toRun = allCells
+			.slice(0, currentIdx + 1)
+			.filter((c) => c.type !== 'markdown');
 
 		for (const cell of toRun) {
 			setRunningCellId(cell.id);
@@ -56,7 +63,10 @@ export function useRunCell(cellData: CellData): {
 				updateCell(cell.id, { ...cell, result } as CellData);
 			} catch (e: unknown) {
 				const message = e instanceof Error ? e.message : String(e);
-				updateCell(cell.id, { ...cell, result: { kind: 'error', message } } as CellData);
+				updateCell(cell.id, {
+					...cell,
+					result: { kind: 'error', message },
+				} as CellData);
 				setRunningCellId(null);
 				return;
 			}

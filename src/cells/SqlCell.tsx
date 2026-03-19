@@ -6,7 +6,11 @@ import { useSheetStore } from '@/store';
 import type { CellData } from '@/store/types';
 import { CellOutput } from './CellOutput';
 import styles from './cells.module.css';
-import { ExecutableCellShell, RunButton, RunWithPriorButton } from './ExecutableCellShell';
+import {
+	ExecutableCellShell,
+	RunButton,
+	RunWithPriorButton,
+} from './ExecutableCellShell';
 import { useRunCell } from './useRunCell';
 
 type SqlCellData = Extract<CellData, { type: 'sql' }>;
