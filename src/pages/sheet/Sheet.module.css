@@ -1,17 +1,28 @@
 .header {
 	display: flex;
 	justify-content: flex-end;
-	margin: 0 20vw;
 	gap: 15px;
-	padding: 20px 30px;
+	padding: 20px calc(30px + 20vw);
 	background-color: var(--bg-cell);
-	border-left: 5px solid var(--border);
+	width: 100%;
+	position: fixed;
+	border-bottom: 1px solid var(--border);
+	z-index: 99;
+}
+
+.header button {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 5px;
+	font-size: 0.7em;
 }
 
 .sheet {
 	display: flex;
 	flex-direction: column;
-	flex: 1;
-	margin: 0 20vw;
+	margin: 100px 20vw;
 	background-color: var(--bg-cell);
+	border-top-right-radius: 12px;
+	border-bottom-right-radius: 12px;
 }

@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { isExecutableCellData } from './types';
 import type { CellData } from './types';
+import { isExecutableCellData } from './types';
 import welcomeCell from './welcome-cell.md?raw';
 
 interface SheetStore {
@@ -10,6 +10,7 @@ interface SheetStore {
 	updateCell: (id: string, cellData: CellData) => void;
 	removeCell: (id: string) => void;
 	moveCell: (id: string, direction: 'up' | 'down') => void;
+	loadCells: (cells: CellData[]) => void;
 	runningCellId: string | null;
 	setRunningCellId: (id: string | null) => void;
 	isEditable: boolean;
@@ -70,6 +71,7 @@ export const useSheetStore = create<SheetStore>()(
 					[cells[idx], cells[swap]] = [cells[swap], cells[idx]];
 					return { cells };
 				}),
+			loadCells: (cells) => set({ cells, isEditable: false }),
 			runningCellId: null,
 			setRunningCellId: (id) => set({ runningCellId: id }),
 			isEditable: false,

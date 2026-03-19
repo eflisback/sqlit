@@ -9,6 +9,10 @@
 	padding-bottom: 20px;
 }
 
+.cell-inserter:first-of-type {
+	padding-top: 20px;
+}
+
 .insert-buttons {
 	padding: 5px 0;
 	display: flex;

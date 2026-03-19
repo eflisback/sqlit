@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { Cell } from '@/components';
 import { CellInserter } from '@/components/cell-inserter/CellInserter';
 import { useSheetStore } from '@/store';
@@ -14,15 +15,14 @@ export const Sheet = () => {
 			<main className={styles.sheet}>
 				{isEditable && <CellInserter index={0} />}
 				{cells.map((cellData, i) => (
-					<>
+					<Fragment key={cellData.id}>
 						<Cell
-							key={cellData.id}
 							cellData={cellData}
 							isFirst={i === 0}
 							isLast={i === cells.length - 1}
 						/>
 						{isEditable && <CellInserter index={i + 1} />}
-					</>
+					</Fragment>
 				))}
 			</main>
 		</>
