@@ -12,6 +12,7 @@ dist
 dist-ssr
 *.local
 public/pyodide
+sheets/
 
 # Editor directories and files
 .vscode/*
