@@ -23,6 +23,8 @@ export const getPy = async (): Promise<PyodideAPI> => {
 	return py;
 };
 
+getPy();
+
 export const runPython = async (code: string): Promise<CellResult> => {
 	const [currentDb, s3] = await getDb();
 	const pyodide = await getPy();
