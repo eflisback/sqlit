@@ -32,6 +32,7 @@ export const runPython = async (code: string): Promise<CellResult> => {
 	// Sync SQLite with Pyodide VFS so Python can access the live database
 	const dbBytes = s3.capi.sqlite3_js_db_export(currentDb);
 	pyodide.FS.writeFile('/memory.db', dbBytes);
+	pyodide.globals.set('SQLIT_MEMORY', '/memory.db');
 
 	try {
 		pyodide.runPython(

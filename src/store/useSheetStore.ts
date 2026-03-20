@@ -42,7 +42,7 @@ export const useSheetStore = create<SheetStore>()(
 					id: 'welcome-python',
 					type: 'python',
 					content:
-						'import sqlite3\n\ncon = sqlite3.connect("/memory.db")\ncur = con.cursor()\nfor row in cur.execute("SELECT * FROM users"):\n    print(row)',
+						'import sqlite3\n\ncon = sqlite3.connect(SQLIT_MEMORY) # Provided by sqlit \ncur = con.cursor()\nfor row in cur.execute("SELECT * FROM users"):\n    print(row)',
 					result: null,
 				},
 			],
