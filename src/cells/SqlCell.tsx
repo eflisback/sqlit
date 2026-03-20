@@ -4,11 +4,16 @@ import { useTheme } from '@/components';
 import { useSheetStore } from '@/store';
 import type { SqlCellData } from '@/store/types';
 import { CellOutput } from './CellOutput';
+import { useDebouncedCallback } from './useDebouncedCallback';
 
 export const SqlCell = ({ cellData }: { cellData: SqlCellData }) => {
 	const updateCell = useSheetStore((state) => state.updateCell);
 	const anyRunning = useSheetStore((state) => state.runningCellId !== null);
 	const { theme } = useTheme();
+	const handleChange = useDebouncedCallback(
+		(code: string) => updateCell(cellData.id, { ...cellData, content: code }),
+		150,
+	);
 
 	return (
 		<>
@@ -18,9 +23,7 @@ export const SqlCell = ({ cellData }: { cellData: SqlCellData }) => {
 				value={cellData.content}
 				editable={!anyRunning}
 				extensions={[sql()]}
-				onChange={(code) =>
-					updateCell(cellData.id, { ...cellData, content: code })
-				}
+				onChange={handleChange}
 			/>
 			<CellOutput result={cellData.result} />
 		</>

@@ -7,13 +7,12 @@ import styles from './Sheet.module.css';
 
 export const Sheet = () => {
 	const cells = useSheetStore((state) => state.cells);
-	const isEditable = useSheetStore((state) => state.isEditable);
 
 	return (
 		<>
 			<Header />
 			<main className={styles.sheet}>
-				{isEditable && <CellInserter index={0} />}
+				<CellInserter index={0} />
 				{cells.map((cellData, i) => (
 					<Fragment key={cellData.id}>
 						<Cell
@@ -21,7 +20,7 @@ export const Sheet = () => {
 							isFirst={i === 0}
 							isLast={i === cells.length - 1}
 						/>
-						{isEditable && <CellInserter index={i + 1} />}
+						<CellInserter index={i + 1} />
 					</Fragment>
 				))}
 			</main>

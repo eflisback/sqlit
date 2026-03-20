@@ -105,6 +105,16 @@
 	color: var(--color-success);
 }
 
+.markdownContent {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.hidden {
+	display: none;
+}
+
 .editor * {
 	/* biome-ignore lint/complexity/noImportantStyles: Override default CodeMirror styling */
 	outline: none !important;

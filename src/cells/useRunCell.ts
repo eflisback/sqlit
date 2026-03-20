@@ -16,7 +16,10 @@ export function useRunCell(cellData: ExecutableCellData): {
 	const updateCell = useSheetStore((state) => state.updateCell);
 	const runningCellId = useSheetStore((state) => state.runningCellId);
 	const setRunningCellId = useSheetStore((state) => state.setRunningCellId);
-	const cells = useSheetStore((state) => state.cells);
+	const showRunWithPrior = useSheetStore((state) => {
+		const idx = state.cells.findIndex((c) => c.id === cellData.id);
+		return idx > 0 && state.cells.slice(0, idx).some(isExecutableCellData);
+	});
 	const status: CellStatus =
 		cellData.result === null
 			? 'none'
@@ -26,9 +29,6 @@ export function useRunCell(cellData: ExecutableCellData): {
 
 	const isLoading = runningCellId === cellData.id;
 	const anyRunning = runningCellId !== null;
-
-	const idx = cells.findIndex((c) => c.id === cellData.id);
-	const showRunWithPrior = cells.slice(0, idx).some(isExecutableCellData);
 
 	const run = useCallback(async () => {
 		if (anyRunning) return;

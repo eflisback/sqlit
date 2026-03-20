@@ -5,6 +5,7 @@ import { useSheetStore } from '@/store';
 import type { PythonCellData } from '@/store/types';
 import { CellOutput } from './CellOutput';
 import styles from './cells.module.css';
+import { useDebouncedCallback } from './useDebouncedCallback';
 import { usePythonInput } from './usePythonInput';
 
 export const PythonCell = ({ cellData }: { cellData: PythonCellData }) => {
@@ -17,6 +18,10 @@ export const PythonCell = ({ cellData }: { cellData: PythonCellData }) => {
 	const { transcript, inputPrompt, submitInput } = usePythonInput(
 		isLoading,
 		cellData.result,
+	);
+	const handleChange = useDebouncedCallback(
+		(code: string) => updateCell(cellData.id, { ...cellData, content: code }),
+		150,
 	);
 
 	const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
@@ -36,9 +41,7 @@ export const PythonCell = ({ cellData }: { cellData: PythonCellData }) => {
 				value={cellData.content}
 				editable={!anyRunning}
 				extensions={[python()]}
-				onChange={(code) =>
-					updateCell(cellData.id, { ...cellData, content: code })
-				}
+				onChange={handleChange}
 			/>
 			{transcript.length > 0 || inputPrompt != null ? (
 				<section className={styles.transcript}>

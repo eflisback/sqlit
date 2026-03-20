@@ -4,8 +4,9 @@
 	"version": "0.0.0",
 	"type": "module",
 	"scripts": {
-		"dev": "vite",
-		"build": "tsc -b && vite build",
+		"setup:pyodide": "node scripts/fetch-pyodide.mjs",
+		"dev": "node scripts/fetch-pyodide.mjs && vite",
+		"build": "node scripts/fetch-pyodide.mjs && tsc -b && vite build",
 		"lint": "biome lint",
 		"format": "biome format --write",
 		"preview": "vite preview"

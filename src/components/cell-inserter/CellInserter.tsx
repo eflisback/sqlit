@@ -12,7 +12,10 @@ interface CellInserterProps {
 }
 
 export const CellInserter = ({ index }: CellInserterProps) => {
+	const isEditable = useSheetStore((state) => state.isEditable);
 	const insertCell = useSheetStore((state) => state.insertCell);
+
+	if (!isEditable) return null;
 
 	const insert = (type: 'markdown' | 'sql' | 'python' | 'load') => {
 		const id = crypto.randomUUID();
