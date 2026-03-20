@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import type { IconType } from 'react-icons';
 import {
 	FaDatabase,
@@ -7,6 +8,7 @@ import {
 	FaPython,
 } from 'react-icons/fa6';
 import type { ExecutableCellData } from '@/store/types';
+import { useSheetStore } from '@/store/useSheetStore';
 import { CellShell } from './CellShell';
 import styles from './cells.module.css';
 import { LoadCell } from './LoadCell';
@@ -51,35 +53,45 @@ export const ExecutableCell = ({
 	const { Icon, label, information } = cellMeta[cellData.type];
 	const { isLoading, anyRunning, status, run, runWithPrior, showRunWithPrior } =
 		useRunCell(cellData);
+	const ref = useRef<HTMLDivElement>(null);
+	const runningCellId = useSheetStore((s) => s.runningCellId);
+
+	useEffect(() => {
+		if (runningCellId === cellData.id) {
+			ref.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+		}
+	}, [runningCellId, cellData.id]);
 
 	return (
-		<CellShell
-			Icon={Icon}
-			label={label}
-			information={information}
-			cellId={cellData.id}
-			isFirst={isFirst}
-			isLast={isLast}
-			isLoading={isLoading}
-			status={status}
-		>
-			{cellData.type === 'sql' && <SqlCell cellData={cellData} />}
-			{cellData.type === 'python' && <PythonCell cellData={cellData} />}
-			{cellData.type === 'load' && <LoadCell cellData={cellData} />}
-			<section className={styles.actions}>
-				<button type='button' onClick={run} disabled={anyRunning}>
-					<FaPlay />
-					<span className={isLoading ? styles.shimmer : undefined}>
-						{isLoading ? 'Running...' : 'Run cell'}
-					</span>
-				</button>
-				{showRunWithPrior && (
-					<button type='button' onClick={runWithPrior} disabled={anyRunning}>
-						<FaForward />
-						<span>Run to here</span>
+		<div ref={ref}>
+			<CellShell
+				Icon={Icon}
+				label={label}
+				information={information}
+				cellId={cellData.id}
+				isFirst={isFirst}
+				isLast={isLast}
+				isLoading={isLoading}
+				status={status}
+			>
+				{cellData.type === 'sql' && <SqlCell cellData={cellData} />}
+				{cellData.type === 'python' && <PythonCell cellData={cellData} />}
+				{cellData.type === 'load' && <LoadCell cellData={cellData} />}
+				<section className={styles.actions}>
+					<button type='button' onClick={run} disabled={anyRunning}>
+						<FaPlay />
+						<span className={isLoading ? styles.shimmer : undefined}>
+							{isLoading ? 'Running...' : 'Run cell'}
+						</span>
 					</button>
-				)}
-			</section>
-		</CellShell>
+					{showRunWithPrior && (
+						<button type='button' onClick={runWithPrior} disabled={anyRunning}>
+							<FaForward />
+							<span>Run to here</span>
+						</button>
+					)}
+				</section>
+			</CellShell>
+		</div>
 	);
 };
