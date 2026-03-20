@@ -3,12 +3,14 @@ import {
 	FaEye,
 	FaFileExport,
 	FaFileImport,
+	FaGitAlt,
 	FaMoon,
 	FaPen,
 	FaSun,
 } from 'react-icons/fa6';
 import { useTheme } from '@/components';
 import { exportSheet, importSheet, useSheetStore } from '@/store';
+import { version } from '../../../package.json';
 import styles from './Sheet.module.css';
 
 export const Header = () => {
@@ -48,41 +50,55 @@ export const Header = () => {
 
 	return (
 		<header className={styles.header}>
-			<button type='button' onClick={handleExport} title='Export sheet'>
-				<FaFileExport />
-				<span>Export sheet</span>
-			</button>
-			<button type='button' onClick={() => fileInputRef.current?.click()}>
-				<FaFileImport />
-				<span>Import sheet</span>
-			</button>
-			<input
-				ref={fileInputRef}
-				type='file'
-				accept='.json'
-				style={{ display: 'none' }}
-				onChange={handleImport}
-			/>
-			<button type='button' onClick={() => setIsEditable(!isEditable)}>
-				{isEditable ? (
-					<>
-						<FaEye />
-						<span>View mode</span>
-					</>
-				) : (
-					<>
-						<FaPen />
-						<span>Edit mode</span>
-					</>
-				)}
-			</button>
-			<button
-				type='button'
-				onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-				title='Toggle theme'
-			>
-				{theme === 'light' ? <FaMoon /> : <FaSun />}
-			</button>
+			<section>Logo</section>
+			<section>
+				<a
+					href='https://github.com/eflisback/sqliteler'
+					target='_blank'
+					className={styles.version}
+					rel='noopener'
+				>
+					<FaGitAlt />
+					<span>{version}</span>
+				</a>
+			</section>
+			<section className={styles.buttons}>
+				<button type='button' onClick={handleExport} title='Export sheet'>
+					<FaFileExport />
+					<span>Export sheet</span>
+				</button>
+				<button type='button' onClick={() => fileInputRef.current?.click()}>
+					<FaFileImport />
+					<span>Import sheet</span>
+				</button>
+				<input
+					ref={fileInputRef}
+					type='file'
+					accept='.json'
+					style={{ display: 'none' }}
+					onChange={handleImport}
+				/>
+				<button type='button' onClick={() => setIsEditable(!isEditable)}>
+					{isEditable ? (
+						<>
+							<FaEye />
+							<span>View mode</span>
+						</>
+					) : (
+						<>
+							<FaPen />
+							<span>Edit mode</span>
+						</>
+					)}
+				</button>
+				<button
+					type='button'
+					onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+					title='Toggle theme'
+				>
+					{theme === 'light' ? <FaMoon /> : <FaSun />}
+				</button>
+			</section>
 		</header>
 	);
 };

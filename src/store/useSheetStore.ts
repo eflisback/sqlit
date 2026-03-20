@@ -29,7 +29,7 @@ export const useSheetStore = create<SheetStore>()(
 				{
 					id: 'welcome-load',
 					type: 'load',
-					url: '/examples/users.sqlite',
+					url: `${window.location.origin}/examples/users.sqlite`,
 					result: null,
 				},
 				{

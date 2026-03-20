@@ -1,730 +1,730 @@
 {
-  "version": 1,
-  "cells": [
-    {
-      "id": "ea389158-6950-4820-b0f8-fec4cad2d7ff",
-      "type": "markdown",
-      "content": "EDAF75 - notebook for lecture 1\n===============================\n\n**Author:** Christian Söderberg\n\n## Week 1: Introduction, relational databases, and SQL\n\nIn the text below there are two kinds of problems:\n\n-   Problems marked **Problem**, which I intend to solve during the lecture. Depending on how fast we progress, I may or may not have time to solve them all – those of the problems we have to skip during the lectures are left as exercises (see below), and we can discuss them during QA sessions.\n\n-   Problems marked **Exercise**, which I suggest you solve yourselves (we can also work on them during the QA sessions).\n\nThis is a *Jupyter notebook*, and they have built in support for Julia, Python, and R (hence Ju-Pyt-R), here's some Python code:"
-    },
-    {
-      "id": "dfb6f213-466e-4f71-a2b8-2e2463f03739",
-      "type": "python",
-      "content": "def hello(name):\n    print(f\"hello, {name}!\")\n\ndef main():\n    name = input(\"What's your name: \")\n    hello(name)\n\nmain()"
-    },
-    {
-      "id": "ffdbf0d1-b6ee-4b02-a34a-375a502eee56",
-      "type": "markdown",
-      "content": "You can run the code snippet above by clicking the _Run cell_ button.\n\nWe're primarily going to run SQL code (see below) in our notebooks, but I'll also show you some Python code later on in the course (the Python code we'll mostly run from the CLI, though).\n\n### Using tables to store data\n\nIf we were to keep track of all Nobel laureates in a Python or Java program, and didn't know about relational databases, we would probably define classes for the laureates, and put them in lists.\nWe could also define classes for the categories, and have one list for each category, or have lists with one element per year, and somehow track all laureates in that year, or use dictionaries/maps.\nHowever we chose to keep track of the data, some searches, insertions and deletions would be easy to implement, and some would be cumbersome.\nWe'd also have to be careful to keep our data consistent.\n\nIn this course, we'll use a technique which may at first seem too simple to be useful, but which turns out to be *incredibly* powerful.\nWe're going to use relational databases, and we'll store the data in 'simple' tables.\nEach table looks like a spreadsheet – here is a table with some Nobel laureates:\n\n| year | category | name | motivation |\n|------|------|------|------|\n| 1901 | chemistry | Jacobus Henricus van 't Hoff | in recognition of the extraordinary services he has rendered by the discovery of the laws of chemical dynamics and osmotic pressure in solutions |\n| 1901 | literature | Sully Prudhomme | in special recognition of his poetic composition, which gives evidence of lofty idealism, artistic perfection and a rare combination of the qualities of both heart and intellect |\n| 1901 | medicine | Emil Adolf von Behring | for his work on serum therapy, especially its application against diphtheria, by which he has opened a new road in the domain of medical science and thereby placed in the hands of the physician a victorious weapon against illness and deaths |\n| 1901 | physics | Wilhelm Conrad Röntgen | in recognition of the extraordinary services he has rendered by the discovery of the remarkable rays subsequently named after him |\n| 1902 | chemistry | Hermann Emil Fischer | in recognition of the extraordinary services he has rendered by his work on sugar and purine syntheses |\n| 1902 | literature | Christian Matthias Theodor Mommsen | the greatest living master of the art of historical writing, with special reference to his monumental work, A history of Rome |\n| 1902 | medicine | Ronald Ross | for his work on malaria, by which he has shown how it enters the organism and thereby has laid the foundation for successful research on this disease and methods of combating it |\n| 1902 | physics | Hendrik Antoon Lorentz | in recognition of the extraordinary service they rendered by their researches into the influence of magnetism upon radiation phenomena |\n| 1902 | physics | Pieter Zeeman | in recognition of the extraordinary service they rendered by their researches into the influence of magnetism upon radiation phenomena |\n| … | … | … | … |\n\nA row represents an item, and a column represents a property of the items –\nin the example above, each row describes a Nobel prize someone has been awarded, and for each such prize, we have columns showing what year the prize was awarded, in what category, the name of the laureate, and the motivation.\n\nThe first basic rule of relational databases is that all 'cells' in the table should be simple values (no lists or objects), and that we can use simple operations from relational algebra to get information from it (cells are *sometimes* allowed to have the value `NULL`, when a value is missing, we'll return to that below).\nTo work with our tables we use a programming language which is highly specialized for manipulating and extracting information, it is called SQL, which is short hand for Structured Query Language, and it's a [*Domain Specific Language*](https://en.wikipedia.org/wiki/Domain-specific_language) (DSL) for finding information in tables.\nSQL can be pronounced as either \"S-Q-L\", or \"sequel\".\n\n### Setting up this notebook\n\nThere are many different Relational Database Management Systems (RDMBS:es) which implements SQL, some of the most prominent are:\n\n-   [PostgreSQL](https://en.wikipedia.org/wiki/PostgreSQL)\n-   [MariaDB](https://en.wikipedia.org/wiki/MariaDB)\n-   [MySQL](https://en.wikipedia.org/wiki/MySQL)\n-   [Oracle](https://en.wikipedia.org/wiki/Oracle_Database)\n-   [Microsoft SQL Server](https://en.wikipedia.org/wiki/Microsoft_SQL_Server)\n-   [IBM DD2](https://en.wikipedia.org/wiki/IBM_Db2_Family)\n-   [SQLite](https://sqlite.org)\n-   [DuckDB](https://duckdb.org)\n\nMost of these systems are client-server-systems, i.e., they have one program, a SQL server, which handles the data, and clients who communicate with the server in various ways.\n\nThere are several different kinds of clients:\n\n-   We can run an IDE, which allows us to see our tables in a GUI.\n\n-   We can run command line clients (CLI) – they are text based programs who work like typical REPLs, output will just be text in a terminal window.\n\n-   We can write scripts which we send to the server, often through a CLI.\n\n-   We can run a notebook (such as this one), and have it communicate with our database.\n\n-   We can write code in a general purpose language, and have it communicate with our database.\n\nIn the course, we'll try all of these methods to access our databases.\n\nThe RDMBS we'll use in the course is SQLite, which is a lightweight but still very powerful system – it is *by far* the most used RDBMS, and it's probably already running on all of your phones and computers (just as an example, if you use Chrome for browsing, your browsing history is typically saved in a SQL-database file `.config/google-chrome/Default/History`, and Mozilla use it for storing meta-data in Firefox and Thunderbird).\nIt's actually not a client/server system (instead it is a library which keeps our databases in files on our computer) – but in the course, we'll think of SQLite as if it were a traditional client/server system, because in many ways, it behaves as one (and new tools like Litestream gives it some of the benefits of a client/server system).\n\nIn order to run SQL in this notebook, we need to load the SQL extension:\n\n… and then we want some database to work on (I've put all the databases used for this lecture in a file called `lect01.sqlite`):"
-    },
-    {
-      "id": "c68ee717-344b-4e1e-b7be-a0a512605146",
-      "type": "load",
-      "url": "/lect01/lect01.sqlite"
-    },
-    {
-      "id": "3efc094c-67ae-4ace-9006-cc18dacbdf21",
-      "type": "markdown",
-      "content": "Now we're good to go!\n\n### Using SQL to find information in a table (`SELECT`)\n\nIf we were to find out who were the Nobel laureates in 1910, we could just look through the lines of our table above, and *if the rows in the table were ordered by year*, it would be easy (that's essentially how mankind has used encyclopedias since they were invented about 2000 years ago).\n\nTo search for values in SQL, we use the `SELECT` statement:\n\n![image](/lect01/select-core-01-SFW.svg)\n\n(the diagram above is taken from SQLite's fabulous web site, you can find out more about the `SELECT` statement [here](https://sqlite.org/lang_select.html)).\n\nIf we follow the lines in the diagram above, we could puzzle together the query:"
-    },
-    {
-      "id": "5d6ba53c-8213-448d-9486-ab24a6137977",
-      "type": "sql",
-      "content": "SELECT   category, name\nFROM     nobel_prizes\nWHERE    year = 1910"
-    },
-    {
-      "id": "3db89308-22e1-49eb-a190-b2c3f47fa8e0",
-      "type": "markdown",
-      "content": "This will return a new table, looking like:\n\n| Category | Name |\n|------|------|\n| chemistry | Otto Wallach |\n| literature | Paul Johann Ludwig Heyse |\n| medicine | Albrecht Kossel |\n| physics | Johannes Diderik van der Waals |\n\nNobel prize was first awarded in 1901, so if we look for winners of the 1900 Nobel prizes, we would get an empty table back:"
-    },
-    {
-      "id": "bdab2a7b-16fd-4fa4-a7ed-a5eebefded32",
-      "type": "sql",
-      "content": "SELECT   category, name\nFROM     nobel_prizes\nWHERE    year = 1900"
-    },
-    {
-      "id": "2e8734d8-9118-4876-a858-e31c305abff8",
-      "type": "markdown",
-      "content": "SQL has a `NULL` value which is sometimes useful (we can use it to signal that one column in a row lacks a value), but observe that there is a *huge* difference between the empty table returned above, and `NULL` (if we had a Python or Java function which was given a list of strings and should return all of these strings which contained an uppercase letter, it should return *an empty list*, not `None` or `NULL`, if there were no such string).\n\n`NULL` values are only used for individual columns, and we could potentially have used it in our Nobel prize database if we had an award for which there was no motivation.\nLet's say the fictional poet Oddput Clementin was awarded the Nobel prize in literature in 2025 – since there is no way to explain why he got it it, we could set `motivation` to `NULL` in that case (we'll return to how we insert data into our tables later)."
-    },
-    {
-      "id": "8004f249-6da1-40c6-9947-e52faddab089",
-      "type": "sql",
-      "content": "INSERT\nINTO nobel_prizes (name, year, category, motivation)\nVALUES ('Oddput Clementin', 2025, NULL, NULL)"
-    },
-    {
-      "id": "c018a9ad-f85e-486e-8800-e6c0cca73a49",
-      "type": "markdown",
-      "content": "The value `NULL` itself is weird, in SQL the test `NULL = NULL` doesn't return `TRUE` or `FALSE`, it's `NULL` (but Jupyter writes that as `None`).\n\nSo the query:"
-    },
-    {
-      "id": "ee030a3f-558f-4691-8d9c-ea448d415955",
-      "type": "sql",
-      "content": "SELECT    year, category, name\nFROM      nobel_prizes\nWHERE     motivation = NULL"
-    },
-    {
-      "id": "ac56fc6e-6271-43f8-b201-bd68a0e16800",
-      "type": "markdown",
-      "content": "would always return an empty result.\n\nTo see if a value is `NULL`, we have to use the `IS` comparison:"
-    },
-    {
-      "id": "62f66537-4ba2-4968-a493-193139a74e95",
-      "type": "sql",
-      "content": "SELECT    year, category, name\nFROM      nobel_prizes\nWHERE     motivation IS NULL"
-    },
-    {
-      "id": "99ae28c6-2acf-4d55-897e-f46af1f8e24b",
-      "type": "markdown",
-      "content": "Despite it's weirdness, `NULL` can actually be useful in SQL, we'll return to this later.\n\nThe fact that we get tables back from our queries is very useful – we'll return to that too in a little while.\n\nIf we wanted to see only laureates in physics in 1910, we'd just refine the condition in our query:"
-    },
-    {
-      "id": "39127b20-59eb-4953-9fd7-aab82a45b19c",
-      "type": "sql",
-      "content": "SELECT   name\nFROM     nobel_prizes\nWHERE    year = 1910 and category = 'physics'"
-    },
-    {
-      "id": "6384daab-a25e-49ef-958b-b862ff71ccf8",
-      "type": "markdown",
-      "content": "**Problem:** How do we get all literature laureates in the 1920ies (see the [docs](https://sqlite.org/lang_select.html))?"
-    },
-    {
-      "id": "b0f1980e-8787-4cf0-b8fd-53d7155ffd3d",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "522b6ebf-5645-4d59-b44c-8f581b0de626",
-      "type": "markdown",
-      "content": "**Problem:** How do we order the literature laureates in the 1920ies by name?"
-    },
-    {
-      "id": "90edd454-bdc3-421b-b5b1-440534ea1e4f",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "7ab492dc-ab89-4831-abbd-ee79114a21f9",
-      "type": "markdown",
-      "content": "How do we get the search result above in reverse order?\n\n**Problem:** Show the first 10 Nobel prizes in chemistry."
-    },
-    {
-      "id": "141674a3-f685-429d-842f-d607b201f7fe",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "cad94650-07cb-4971-8316-1e1190d9b7ff",
-      "type": "markdown",
-      "content": "**Problem:** Show Nobel prize number 32 to 42 in medicine (in chronological order)."
-    },
-    {
-      "id": "1fba54be-50c6-4c0a-a050-df9d07870101",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "ecaf0c95-fa44-44e7-b5fb-6c1e6a9a0791",
-      "type": "markdown",
-      "content": "There is a subtlety here which we'll get back to below.\n\n**Problem:** What year did Albert Einstein get his award?"
-    },
-    {
-      "id": "6b581c12-7668-4c0f-9390-ce939b7cb4ff",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "dcd4e6e9-901f-444b-8301-5f6691441401",
-      "type": "markdown",
-      "content": "**Problem:** What year, and in what category did Churchill get his Nobel prize?"
-    },
-    {
-      "id": "5b643d89-bc4f-4552-86d4-06efc2fd97e4",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "320fade4-3164-4b9c-92ed-1f746f102542",
-      "type": "markdown",
-      "content": "Most databases have the `LIKE` predicate, quite a few also have some kind of regular expressions.\n\nBTW: representing a laureate as just a string is very primitive, next time we'll see how to represent compound data (the problem here is that the first rule of relational databases only allows primitive values in our cells).\n\n### Selecting only distinct values\n\nIf we wanted to see what categories are in our `nobel_prizes` table, we could write:"
-    },
-    {
-      "id": "670b02fe-83ae-4d04-be98-f207e47b94e0",
-      "type": "sql",
-      "content": "SELECT    category\nFROM      nobel_prizes"
-    },
-    {
-      "id": "e36585f9-fe0d-49fd-8536-375bfe10fd88",
-      "type": "markdown",
-      "content": "but we would get many repetitions. To see only the *distinct* values, we can use a `SELECT DISTINCT` query:"
-    },
-    {
-      "id": "671b8200-d4f2-42f2-90f8-fb27ca2000ff",
-      "type": "sql",
-      "content": "SELECT DISTINCT  category\nFROM             nobel_prizes"
-    },
-    {
-      "id": "86897e83-51f2-4786-bd8b-76c13cb9cdad",
-      "type": "markdown",
-      "content": "**Problem:** What categories of Nobel prizes were awarded in each of the years between 1910 and 1919?"
-    },
-    {
-      "id": "dde98a79-b156-477d-8429-826167eb4850",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "33ae7ad4-bd28-4c22-9ae9-126847c53362",
-      "type": "markdown",
-      "content": "Can you spot which prizes (year, category) were withheld?\nNext time we'll write a query to find all 'missing' prizes.\n\n### SQL scalar functions\n\nIn the [docs](https://sqlite.org/lang_select.html), we see that the general form of the `SELECT` statement allows a `result-column`, and that a `result-column` can contain an `expr`.\nThis opens up many, many possibilities (some of which we will get back to below), one of them is the use of simple scalar functions.\nWe can also use these functions in other places, such as in our `WHERE` or `ORDER BY` clauses.\n\nWe can se the standard *core functions* [here](https://sqlite.org/lang_corefunc.html), try to use them to do the following:\n\n**Problem:** Show the initial letter of each of the laureates in the year 2023."
-    },
-    {
-      "id": "248f4290-7809-4313-8915-da5bbf2e7ba7",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "97aa9da7-553e-4720-b8ea-a0fe70a996a9",
-      "type": "markdown",
-      "content": "**Problem:** Show the 10 first winners in the following format (see the `format`-function – unfortunately it will not look great in the notebook…):\n\n    1901: chemistry  Jacobus Henricus van 't Hoff\n    1901: literature Sully Prudhomme\n    1901: medicine   Emil Adolf von Behring\n    1901: physics    Wilhelm Conrad Röntgen\n    1902: chemistry  Hermann Emil Fischer\n    1902: literature Christian Matthias Theodor Mommsen\n    1902: medicine   Ronald Ross\n    1902: physics    Hendrik Antoon Lorentz\n    1902: physics    Pieter Zeeman\n    1903: chemistry  Svante August Arrhenius"
-    },
-    {
-      "id": "3cea5205-3204-434e-9c89-527e177be1ea",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "4e19ebf0-1988-4ba7-b0a9-0aa931ab1bf9",
-      "type": "markdown",
-      "content": "**Problem:** List the five laureates with the shortest names."
-    },
-    {
-      "id": "16d93a6e-3c6a-40bc-9347-f6a1f5deb556",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "2bf38a9f-25c0-4b63-9e51-f405443ad9b4",
-      "type": "markdown",
-      "content": "### SQL aggregate functions\n\nThe functions above were applied to one or more columns in a row, and they returned results for each row.\nThere is another kind of SQL function, called an *aggregate function*.\nAn aggregate function collapses a whole table (or part of it, see below) into one row – the SQLite docs list some aggregate functions [here](https://www.sqlite.org/lang_aggfunc.html).\n\nOne simple such function is `count(X)` – it counts the number of times an expression is not `NULL` in a column, so to see how many Nobel laureates we have in our database, we can write:"
-    },
-    {
-      "id": "7e8477f1-849e-417d-ad31-f83d801ee2b9",
-      "type": "sql",
-      "content": "SELECT    count(name)\nFROM      nobel_prizes;"
-    },
-    {
-      "id": "b5c3a67a-546d-4550-beaa-d123e0c842ea",
-      "type": "markdown",
-      "content": "This query returns just one row, with the count (what else could it have returned?).\n\nEach row in our `nobel_prize` table will have a defined `name` (there are no `NULL` values), and we can use an alternative version of the `count` function, which is just `count()` (without any argument), and it count each row, without checking possible `NULL` values.\n\nThere is also a nice `count()`-related trick which can be useful sometimes – if we only want to count how many *different* values we find in a column (or expression potentially containing several columns), we can use `count(DISTINCT X)`.\n\n**Problem:** How many *different* Nobel laurates are there?\n(We'll assume all laureates have different names, and up until now that's actually true.)"
-    },
-    {
-      "id": "e7a33c24-9865-407c-9f7f-d4181408cd4d",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "9dd9723c-65a7-42a2-a796-db5e150907ed",
-      "type": "markdown",
-      "content": "**Problem:** How many Nobel prizes were awarded in 2023?"
-    },
-    {
-      "id": "fc3f962b-e4e8-42bb-a402-d25bac5c267c",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "a9b140cf-ae38-4885-aa6b-e85b6985c023",
-      "type": "markdown",
-      "content": "**Problem:** How many different categories are there in the `nobel_prizes` table?"
-    },
-    {
-      "id": "b5e7134d-219f-433a-82cb-2e51e6054027",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "15901a94-f036-4507-b8ce-212f82b4bdf8",
-      "type": "markdown",
-      "content": "**Problem:** When was the first Nobel prize awarded?"
-    },
-    {
-      "id": "620ef3b7-8e74-4fcf-901b-4b5e8b873459",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "7a9eb5b0-a5d2-474f-ab6d-22c1d6ea0e2c",
-      "type": "markdown",
-      "content": "**Exercise:** How many Nobel prizes in chemistry have been awarded?"
-    },
-    {
-      "id": "a765ff9b-8e74-4ecf-a360-acc93ec19779",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "1928a670-ea6b-434f-8ecc-5b545ae0ee43",
-      "type": "markdown",
-      "content": "**Exercise:** How many different Nobel laureates in chemistry are there?"
-    },
-    {
-      "id": "2905fe1e-2852-40ec-bf06-afbbcb21d240",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "34adae62-19bf-48a2-8abe-1031183086cd",
-      "type": "markdown",
-      "content": "### `GROUP BY` and `HAVING`\n\nUsing `GROUP BY` we can handle rows in groups – to understand how it works, lets first look at the following query:"
-    },
-    {
-      "id": "14a4e922-3a73-49c7-9061-90c54fcd3494",
-      "type": "sql",
-      "content": "SELECT    category, name\nFROM      nobel_prizes\nWHERE     year = 2013\nORDER BY  category"
-    },
-    {
-      "id": "f1858e24-e078-4ad1-9cad-956b7c1cf4dc",
-      "type": "markdown",
-      "content": "Here the rows of each category will end up adjacent to each other, but if we want to see how many laureates we have in each category, we can't just call `count()`:"
-    },
-    {
-      "id": "819db8e7-474d-4f05-9b3f-7e010bcd881e",
-      "type": "sql",
-      "content": "SELECT    category, count()\nFROM      nobel_prizes\nWHERE     year = 2013\nORDER BY  category"
-    },
-    {
-      "id": "f5614436-2488-4e89-9117-24865b64ac6e",
-      "type": "markdown",
-      "content": "since the aggregate function `count()` collapses the resulting table into one row.\n\nBut if we use `GROUP BY`, we insert an invisible divider between groups of values, and perform any aggregate function only on each 'group':"
-    },
-    {
-      "id": "4c4f7f5c-1dce-4ac3-94fe-a9509b6f512d",
-      "type": "sql",
-      "content": "SELECT    category, count()\nFROM      nobel_prizes\nWHERE     year = 2013\nGROUP BY  category"
-    },
-    {
-      "id": "dcc30edc-9fab-4c21-aa9c-a857a144f610",
-      "type": "markdown",
-      "content": "So, if we apply an aggregate function, such as `count()`, in a table which we have grouped, the function will be applied to each group, not to the whole table, and instead of getting one `count()` for the whole table, we get one `count()` for each group (as above).\n\nIf we add `name` in the first line, we get a somewhat arbitrary result:"
-    },
-    {
-      "id": "68d6abf4-bef7-4fd9-8bc1-6a9a136268e9",
-      "type": "sql",
-      "content": "SELECT    category, count(), name\nFROM      nobel_prizes\nWHERE     year = 2013\nGROUP BY  category"
-    },
-    {
-      "id": "b2a53e61-7fb6-4586-9397-eede73feca4e",
-      "type": "markdown",
-      "content": "The category and count is correct, but only one name is shown for each category.\n\nThe 'problem' is that we only get one row per group in the output, and that there may be several laureates in each group – our query will return one of them in a seemingly haphazard manner.\nTo alleviate this problem, SQLite defines an aggregate function [`group_concat`](https://www.sqlite.org/lang_aggfunc.html#group_concat), which concatenates all values in the group (it also has the alias `string_agg`, to match the corresponding function in PostgreSQL):"
-    },
-    {
-      "id": "334e260f-3daa-48b9-811d-82730767525d",
-      "type": "sql",
-      "content": "SELECT    category, count(), group_concat(name, \", \") AS \"names\"\nFROM      nobel_prizes\nWHERE     year = 2013\nGROUP BY  category"
-    },
-    {
-      "id": "73b5dac9-4fe3-4201-be92-4d6ff20803a3",
-      "type": "markdown",
-      "content": "In recent versions of SQLite it's also possible to order the values in an aggregate function such as `group_concat` by using `ORDER BY` inside the function call (see the [docs](https://www.sqlite.org/lang_aggfunc.html)).\n\nObserve that there is no problem displaying `category` in the SELECT-statement above, we get a value which we know will be the same for each row in the group (this is by definition, since that's what we grouped by).\n\nIf we're only interested in those categories with less than three laureates, we use `HAVING` to select only groups with a given property:"
-    },
-    {
-      "id": "2a85924e-7b76-42f3-82ef-4041f7a7f23c",
-      "type": "sql",
-      "content": "SELECT    category, count(), group_concat(name, \", \") AS \"names\"\nFROM      nobel_prizes\nWHERE     year = 2013\nGROUP BY  category\nHAVING    count() < 3"
-    },
-    {
-      "id": "d86d1522-2742-47e1-a586-eab9b99e6f57",
-      "type": "markdown",
-      "content": "This corresponds to a `WHERE` statement, *but it applies to groups*, not to individual rows (as `WHERE` does) – so `WHERE` and `HAVING` have similar effects (they somehow narrow a search), *but they're absolutely not interchangable!*\n\nImportant (and often misunderstood): In the query above we first have a `WHERE` statement to select some rows from the whole table, and then group the resulting selection – this can be seen in this diagram:\n\n![image](/lect01/select-00-overview.svg)\n\nEvery time we have both a `WHERE` and a `HAVING` in the same query, we must first use `WHERE` to select rows we can group, and then use `HAVING` to select groups.\nWe can use `WITH` statements or subqueries (see below) if we want to have it the other way around.\n\n**Problem:** Has anyone won more than one Nobel prize? We can assume the names of the laureates are unique (so far they are)."
-    },
-    {
-      "id": "c137d194-696e-4fa3-a6c8-2427f07b55bf",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "c3ec1503-f23b-46e6-b718-46fd661748c0",
-      "type": "markdown",
-      "content": "**Problem:** How many laureates are there in each category?"
-    },
-    {
-      "id": "483de5e9-dea2-4877-8914-c7d29444c93a",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "dcb24b99-6962-4b4d-a52d-683ea7d3bf87",
-      "type": "markdown",
-      "content": "**Problem:** Which categories have had more than 200 laureates?"
-    },
-    {
-      "id": "a387b675-f938-4f8b-b276-6666154d9137",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "925aa4a8-d9f3-4f9f-86e1-40eeb90b57bd",
-      "type": "markdown",
-      "content": "**Exercise:** How many laureates were there each year between 1920 and 1930?"
-    },
-    {
-      "id": "e0169355-e19d-42ff-bbf9-ac17d7206c26",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "cbe19c62-9c2e-45f5-873b-917cb265e5aa",
-      "type": "markdown",
-      "content": "**Exercise:** Which years saw more than 9 laureates?"
-    },
-    {
-      "id": "bf72c22b-4f30-4b1a-bec8-d73f8ee6df1c",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "489da917-d3a6-41a5-9f30-f26e441e4811",
-      "type": "markdown",
-      "content": "Can you also show who the laureates were in those years, and even better, for each of them also show in which category they were awarded.\n\n**Exercise:** Which have been the 20 years with most laureates? (We don't need to be precise in case of ties.)"
-    },
-    {
-      "id": "bd975eb5-3437-4055-8f39-a6995d0fc7ad",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "a9d55ab5-88e4-4e1a-abe1-69554f9f1914",
-      "type": "markdown",
-      "content": "#### Using `CASE WHEN`\n\nWhen we group values, we can make use of the `CASE WHEN` construct (see the penultimate track in the diagram below):\n\n![image](/lect01/select-expr.svg)\n\nFor instance, we can use it to categorize the era for each of the physics laureates having a name beginning with 'A':"
-    },
-    {
-      "id": "e98a06f5-cfa0-45d7-aeca-47463f9f05d2",
-      "type": "sql",
-      "content": "SELECT   year, name,\n         CASE\n             WHEN year < 1970 THEN 'ancient era'\n             WHEN year <= 2000 THEN 'a long time ago'\n             ELSE 'quite recently'\n         END AS era\nFROM     nobel_prizes\nWHERE    category = 'physics' AND name LIKE 'A%'"
-    },
-    {
-      "id": "c5539da8-85f3-47b2-aa77-a32cd68e2b0d",
-      "type": "markdown",
-      "content": "**Problem:** Use the `CASE WHEN` construct and `GROUP BY` to count the number of physics laureates beginning with 'A' in each era."
-    },
-    {
-      "id": "2d95d5fe-12d3-460d-88bc-865f2677c848",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "300f1315-89be-4f75-bb13-5cd374570e16",
-      "type": "markdown",
-      "content": "### Window functions\n\nAs we saw above, we can treat partitions of our rows as 'groups', by using `GROUP BY`.\n\nWe also saw than when we use an aggregate function on a group, we collapse whole groups into one row in the output (and when we apply it to a table without groups, the whole table collapses into one row) – but sometimes we want to apply aggregate functions within a group of values, *and keep each row in the output*.\n\nAbove we listed all laureates in 2013, now we want to add one column to the output: for each laureate, we want to show how many laureates shared the prize in her or his category.\n\nIf we use `GROUP BY` and the aggregate function `count()` on the categories, we would only get one row per category, and using `count()` without grouping would collapse the whole result into just one row:"
-    },
-    {
-      "id": "43e6e269-9118-4c8d-8729-a8936055ef77",
-      "type": "sql",
-      "content": "SELECT    category, name, count() AS count      -- oh no!\nFROM      nobel_prizes\nWHERE     year = 2013\nORDER BY  category"
-    },
-    {
-      "id": "18239749-522f-478d-b7bc-3b490055d000",
-      "type": "markdown",
-      "content": "Fortunately, SQL has a way to apply functions only over 'partitions' of our tables, and keep all rows in the output – using the reserved word `OVER` we can introduce a 'window' of our rows, and apply the function only over this window:"
-    },
-    {
-      "id": "9014b02f-9904-4157-9d67-fbb3763e54d9",
-      "type": "sql",
-      "content": "SELECT    category,\n          name,\n          count() OVER (PARTITION by category) AS count\nFROM      nobel_prizes\nWHERE     year = 2013\nORDER BY  category"
-    },
-    {
-      "id": "a4daeb9b-b946-48d3-9100-f8da8515a6d5",
-      "type": "markdown",
-      "content": "We can also give our windows names, using an alias:"
-    },
-    {
-      "id": "67e740d0-9805-4576-8749-d1c5f8115add",
-      "type": "sql",
-      "content": "SELECT    category,\n          name,\n          count() OVER categories AS count\nFROM      nobel_prizes\nWHERE     year = 2013\nWINDOW    categories AS (PARTITION by category)\nORDER BY  category"
-    },
-    {
-      "id": "75653daa-199b-4300-8af9-ee3b6165b040",
-      "type": "markdown",
-      "content": "The aliased window definitions must come after any `WHERE` and `HAVING`, and before any `ORDER BY`.\n\nSo, if we use the reserved word `OVER` after a function, the function will be applied according to a 'window' (there is more to it than this, but this will suffice for now).\nIn the window we can:\n\n-   define a partition, using `PARTITION BY`,\n\n-   define an order, using `ORDER BY`, and\n\n-   define a range, which we can use to define groups of rows relative to each other (but we won't look at ranges in the course).\n\nThe function will be applied to each partition, in the same way we applied aggregate functions on groups above, but now we won't collapse the partitions.\nObserve that the partitioning and ordering are based only on the selection we make (i.e., only those rows which are chosen in our `WHERE` clause).\n\nWe can use our regular aggregate functions as window functions, but there are also a couple of dedicated window functions, such as (there are more, but we won't use them in the course):\n\n-   `rank()`: ranks rows by the order specified in the window, ties can occur,\n\n-   `row_number()`: as `rank()`, but now we avoid ties, and rank by row number in the output, and\n\n-   `percent_rank()`: gives a value between 0.0 and 1.0 (so it's a bit of a misnomer), giving the row's relative rank within its partition.\n\nYou can find more [here](https://sqlite.org/windowfunctions.html).\n\n**Problem:** Add one column which 'ranks' the laureates of 2013 in the table above according to the lengths of their names, within the categories – shorter names should come before longer names."
-    },
-    {
-      "id": "fe22f0a8-bcb7-4370-8c42-7d5671d7ed50",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "1176d5be-608b-4e59-818e-1833a5505bfe",
-      "type": "markdown",
-      "content": "**Exercise:** Above we listed Nobel prize number 32 to 42 in medicine, in chronological order, but our only way to check that our numbering is correct would be to list all the first laureates, and then count manually.\nNow use a window function to enhance the output from the query above with the chronological order of each laureate."
-    },
-    {
-      "id": "6fd07208-367c-419c-8927-65ad4d0dcdb9",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "18caab89-f242-4fa2-ac03-a3f8d0ac81ed",
-      "type": "markdown",
-      "content": "**Exercise:** For each laureate with the initial A, list their category, year, name, and 'freshness' within that category, i.e., the most recent laureate in a category is ranked 1, the second most recent laureate is ranked 2, etc. The ranks should be confined to laureates with the initial A (we need some more tools to rank the 'freshness' over the whole category, but will get to it next time)."
-    },
-    {
-      "id": "5c3fee4c-3ecb-451e-8ed0-dadc2af473ce",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "9fc24e2d-33ca-4df8-99a1-50533be160e0",
-      "type": "markdown",
-      "content": "### Some exercises\n\nTo spice things up a bit, I've included a table with all olympic games since 1896 – the table `olympics` contains the columns:\n\n-   `year`\n-   `city`\n-   `country`\n-   `continent`\n-   `season`\n-   `ordinal_number`\n\nIf we look carefully at this table, we can find some unnecessary repetition (try to find it!) – we will address this problem during lecture 2, but for now, we'll let it pass.\n\n**Exercise:** How many olympic games have each continent hosted?"
-    },
-    {
-      "id": "fd2fce53-8ab8-4e5e-9b50-c63c8de43801",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "f0f39383-fca7-47b5-a0bf-bdb7c8a9206a",
-      "type": "markdown",
-      "content": "**Exercise:** When was the first olympic games in each continent?"
-    },
-    {
-      "id": "b66e400b-aa1c-496a-8c68-a3d6168058d2",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "5217d959-12fa-4165-b7d2-f566c3eb2fd0",
-      "type": "markdown",
-      "content": "**Exercise:** Which countries have hosted the summer olympics more than once?"
-    },
-    {
-      "id": "a2c713c0-acdc-44b8-b08c-4434fc2a500b",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "6adc6af0-8331-4386-bb2f-35c4bdbe7a3e",
-      "type": "markdown",
-      "content": "**Exercise:** List the continents in descending order by the number of times they've hosted the summer olympics"
-    },
-    {
-      "id": "f7fbe9c6-df84-465a-be4d-44b43dd8b999",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "4a6335de-32de-417a-a25d-ec0098acbcd7",
-      "type": "markdown",
-      "content": "**Exercise:** Show a 'histogram' (no actual diagram, just the counts) over the the initial letter of the names of all Nobel laureates (see how big your chance is…)."
-    },
-    {
-      "id": "2b7d6726-5f15-400e-9149-ee1f235b4250",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "ef38228e-c35c-4c7a-8eb5-46ac131c4890",
-      "type": "markdown",
-      "content": "**Exercise:** Show a 'histogram' over the the initial letter of the names of all Nobel laureates, *for each category*."
-    },
-    {
-      "id": "d22f87be-9643-46d3-8fa5-15d32449b227",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "118b2d54-3fe0-45f9-b816-2f1aec2d473e",
-      "type": "markdown",
-      "content": "**Exercise:** Has anyone won more than one Nobel prize in the same category?"
-    },
-    {
-      "id": "2be9af64-c4d4-455c-baa6-0a41f60b065a",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "01fc15f9-366c-47f0-a885-262bc51001ca",
-      "type": "markdown",
-      "content": "To find out if someone has won in more than one category, we need a subquery (see below).\n\n**Exercise:** For each olympic game, show how many olympic games had come before it in its continent. (Requires window functions)"
-    },
-    {
-      "id": "c02542b4-c5a4-4452-a4f4-e207835f2b52",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "f6466109-aeea-4717-a29b-cd18018b7330",
-      "type": "markdown",
-      "content": "### Subqueries, Views and Common Table Expressions (CTEs)\n\nAs we noted above, the result of a `SELECT` statement is itself a (kind of) table, and we can use such a table inside other [`SELECT` statements](https://sqlite.org/lang_select.html).\n\nOne useful pattern is:\n\n    SELECT ...\n    FROM   ...\n    WHERE  ... IN\n           (SELECT ...\n            FROM ...\n            WHERE ...)\n\nThe second, nested query is called a *subquery*.\n\nWe'll use a subquery to find all literature laureates who split their prizes – to do it we begin with a regular query, to find which years the Nobel prize for literature were split?"
-    },
-    {
-      "id": "a2d86786-eeea-40df-a294-e8417cc68e66",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "e57f26b5-7ac5-49ad-aabc-c0a30fb8a56f",
-      "type": "markdown",
-      "content": "… and now we use the result of that query to find out what we're really looking for:"
-    },
-    {
-      "id": "4c0de445-2409-43cb-8cbe-43787f1c792d",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "2414c464-f164-4eac-9f8e-25570db8f394",
-      "type": "markdown",
-      "content": "This can be simplified by using either of two ways to define 'temporary tables':\n\n-   *views*\n-   *Common Table Expressions* (CTE:s).\n\nA *view* can be seen as a new table, containing the result of a query – to create a view with the years where the literature prize was shared, we can write:"
-    },
-    {
-      "id": "26b52fe8-d095-49ee-a6b8-8c116019b49b",
-      "type": "sql",
-      "content": "CREATE VIEW shared_literature_prize(year) AS\n  SELECT ... -- just as above..."
-    },
-    {
-      "id": "b8589fb0-2f70-4f3c-865c-6e7b6440e557",
-      "type": "markdown",
-      "content": "We can now use our view in a query:"
-    },
-    {
-      "id": "1366d58d-a446-4fcc-a90a-26b4bcae7cc1",
-      "type": "sql",
-      "content": "SELECT    year, name\nFROM      nobel_prizes\nWHERE     category = 'literature'\n          AND year IN (\n            SELECT    year\n            FROM      shared_literature_prize\n          )"
-    },
-    {
-      "id": "d21d0bb1-b6a1-45f2-ac9f-cc7afe09b9c7",
-      "type": "markdown",
-      "content": "There is only one attribute in our `shared_literature_table`, and we can simplify this expression:"
-    },
-    {
-      "id": "7defb267-cb9e-4693-b15a-f8b469840b40",
-      "type": "sql",
-      "content": "SELECT    year, name\nFROM      nobel_prizes\nWHERE     category = 'literature'\n          AND year IN shared_literature_prize"
-    },
-    {
-      "id": "c4c70e8e-56cf-433c-ac8e-1ddf12c0216e",
-      "type": "markdown",
-      "content": "If we have more than one column in the output of the subquery, we must compare it to a tuple within parentheses (this is a quite new addition to SQL, so it might not work everywhere).\n\nThe view will be around until we decide to remove it with:"
-    },
-    {
-      "id": "7e775c40-c34d-47c5-bece-15a2a6441971",
-      "type": "sql",
-      "content": "DROP VIEW shared_literature_prize"
-    },
-    {
-      "id": "8212eabc-7619-4a3a-8ef8-6f475577800d",
-      "type": "markdown",
-      "content": "A view isn't actually a table – each time the view is used it runs its query, which will take some time, but it means we get all updates in the underlying table(s).\n\nA *Common Table Expression* (or *CTE*) is like a view, but only defined as part of a query, so we'd write it like:"
-    },
-    {
-      "id": "e5f1012d-f276-4183-a96b-ed75f25e404d",
-      "type": "sql",
-      "content": "WITH\n  shared_literature_prize(year) AS (\n    SELECT ... -- as above...\n  )\nSELECT    year, name\nFROM      nobel_prizes\nWHERE     category = 'literature'\n          AND year IN shared_literature_prize"
-    },
-    {
-      "id": "6d760b86-0bba-47ad-a89f-2c95d4cc7884",
-      "type": "markdown",
-      "content": "There are some things which makes CTEs very nice:\n\n-   they're defined as part of a `SELECT` statement (so there is nothing to drop afterwards),\n-   since they're part of a `SELECT` statement, we only need one statement (which will become useful when we call our database remotely, we'll return to that later in the course), and\n-   they can be defined recursively (we'll return to that too later in the course).\n\n**Problem:** Show the years and categories for recurring laureates (i.e., laureates who has won more than once) – use a CTE to do it."
-    },
-    {
-      "id": "2b159ee0-d21a-4986-95a9-e91d0782ac53",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "e6385e34-2b1e-4be1-b65e-a677c30f6494",
-      "type": "markdown",
-      "content": "**Exercise:** Who has won the literature prize in a year when at least one chemistry laureate had a name beginning with 'L'? First try to solve this with a regular subquery:"
-    },
-    {
-      "id": "224c9792-5661-435b-a2d4-86446c66d0f5",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "60f3f3f0-6ae7-4714-9352-e0e9e253a5e5",
-      "type": "markdown",
-      "content": "… and then rewrite it using a CTE:"
-    },
-    {
-      "id": "00cd39f3-11f6-4bc0-9e8d-908175a6a4c3",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "2810d85a-2833-4964-9dbc-b049ca4ec49b",
-      "type": "markdown",
-      "content": "We saw above that we can't have another `WHERE` after the `HAVING` clause:"
-    },
-    {
-      "id": "7c01511f-24cf-4e67-89e5-994798ec82f1",
-      "type": "sql",
-      "content": "SELECT    category, count() AS count\nFROM      nobel_prizes\nWHERE     year = 2013\nGROUP BY  category\nHAVING    count() < 3\nWHERE     count > 1        --   <-- not allowed!"
-    },
-    {
-      "id": "a0223e42-c4ad-4141-9c9b-8c1d4ac3b353",
-      "type": "markdown",
-      "content": "but we can make our 'grouping query' into a subquery, and have another `WHERE` in the outer query:"
-    },
-    {
-      "id": "810ecb41-a13a-4767-b58d-ec99a4d1c56b",
-      "type": "sql",
-      "content": "SELECT category, count\nFROM (\n    SELECT    category, count() AS count\n    FROM      nobel_prizes\n    WHERE     year = 2013\n    GROUP BY  category\n    HAVING    count() < 3)\nWHERE  count > 1"
-    },
-    {
-      "id": "6835a4d8-f69c-4632-9ca4-0160432bc64e",
-      "type": "markdown",
-      "content": "A somewhat tidier way of expressing this is to use a WITH-statement (CTE):"
-    },
-    {
-      "id": "df39c9e5-c313-4b2e-80c0-78cdaa704ac1",
-      "type": "sql",
-      "content": "WITH category_count(category, count) AS (\n    SELECT    category, count()\n    FROM      nobel_prizes\n    WHERE     year = 2013\n    GROUP BY  category\n    HAVING    count() < 3\n)\nSELECT category, count\nFROM   category_count\nWHERE  count > 1"
-    },
-    {
-      "id": "7797d6d0-7cec-4913-858a-8fb66d454de4",
-      "type": "markdown",
-      "content": "**Exercise**: How many *different* laureates do we have in each category?\nObserve that there are a couple of laureates with two awards in the same category, they should only be counted once – Marie Curie, on the other hand, has won in two categories, so she should be counted in two different categories.\nUse a CTE to keep track of all laureates in each category."
-    },
-    {
-      "id": "2595e126-e426-4abc-b230-534835a20501",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "0547c126-7714-49b1-b48c-f14dbb9bcca7",
-      "type": "markdown",
-      "content": "**Exercise**: Above we wrote a query to find laureates who hade more than one award in a category, now write a query to find laureates who has won in more than one category."
-    },
-    {
-      "id": "b30f0a4b-eb23-478f-a174-f183d6ae8e7a",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "a96b1de7-b067-4606-81a4-4c541bf89cd8",
-      "type": "markdown",
-      "content": "**Problem:** There is a very handy function which returns a series of values – it's called [`generate_series`](https://www.sqlite.org/series.html), and you can try to use it to see which years from 1901 until now when no Nobel price at all ware awarded."
-    },
-    {
-      "id": "d01dca0b-4cd6-48e3-91ba-002475df0ef0",
-      "type": "sql",
-      "content": ""
-    },
-    {
-      "id": "77cb48ea-1f47-46bc-98c4-7fc278998991",
-      "type": "markdown",
-      "content": "#### Correlated subqueries\n\nAnother form of subquery allows us to correlate two `SELECT` statements, so that we use values from an outer `SELECT` statement inside the `SELECT` statement in a subquery. As an example, solve the following problem:\n\n**Problem:** List the names of all laureates who have the longest name of all laureates in their categories (in case of ties, all should be listed) – order by category.\n\nHere we can use a subquery which is 'run' for each row in our main query:"
-    },
-    {
-      "id": "2311f6a9-666a-4d03-a3af-ba333199d538",
-      "type": "sql",
-      "content": "SELECT  category, year, name\nFROM    nobel_prizes AS outer_nobel\nWHERE   length(name) = (\n            SELECT max(length(name))\n            FROM   nobel_prizes\n            WHERE  category = outer_nobel.category)\nORDER BY category"
-    },
-    {
-      "id": "03d3faf6-220e-45bb-be12-c521fa504eaa",
-      "type": "markdown",
-      "content": "This is called a correlated subquery (since we refer to the enclosing query inside it). We use an alias to distinguish between the `nobel_prizes` table in the outer query and the `nobel_prizes` table in the subquery (it's the same table, but we 'iterate' through it separately).\n\nBTW, we could have skipped the `AS` in\n\n    ...\n    FROM    nobel_prizes AS outer_nobel\n    ...\n\nand just written:\n\n    ...\n    FROM    nobel_prizes outer_nobel\n    ...\n\nThe general opinion is that we should use `AS`, as it makes it more obvious that we're defining an alias."
-    }
-  ]
+	"version": 1,
+	"cells": [
+		{
+			"id": "ea389158-6950-4820-b0f8-fec4cad2d7ff",
+			"type": "markdown",
+			"content": "EDAF75 - notebook for lecture 1\n===============================\n\n**Author:** Christian Söderberg\n\n## Week 1: Introduction, relational databases, and SQL\n\nIn the text below there are two kinds of problems:\n\n-   Problems marked **Problem**, which I intend to solve during the lecture. Depending on how fast we progress, I may or may not have time to solve them all – those of the problems we have to skip during the lectures are left as exercises (see below), and we can discuss them during QA sessions.\n\n-   Problems marked **Exercise**, which I suggest you solve yourselves (we can also work on them during the QA sessions).\n\nThis is a *Jupyter notebook*, and they have built in support for Julia, Python, and R (hence Ju-Pyt-R), here's some Python code:"
+		},
+		{
+			"id": "dfb6f213-466e-4f71-a2b8-2e2463f03739",
+			"type": "python",
+			"content": "def hello(name):\n    print(f\"hello, {name}!\")\n\ndef main():\n    name = input(\"What's your name: \")\n    hello(name)\n\nmain()"
+		},
+		{
+			"id": "ffdbf0d1-b6ee-4b02-a34a-375a502eee56",
+			"type": "markdown",
+			"content": "You can run the code snippet above by clicking the _Run cell_ button.\n\nWe're primarily going to run SQL code (see below) in our notebooks, but I'll also show you some Python code later on in the course (the Python code we'll mostly run from the CLI, though).\n\n### Using tables to store data\n\nIf we were to keep track of all Nobel laureates in a Python or Java program, and didn't know about relational databases, we would probably define classes for the laureates, and put them in lists.\nWe could also define classes for the categories, and have one list for each category, or have lists with one element per year, and somehow track all laureates in that year, or use dictionaries/maps.\nHowever we chose to keep track of the data, some searches, insertions and deletions would be easy to implement, and some would be cumbersome.\nWe'd also have to be careful to keep our data consistent.\n\nIn this course, we'll use a technique which may at first seem too simple to be useful, but which turns out to be *incredibly* powerful.\nWe're going to use relational databases, and we'll store the data in 'simple' tables.\nEach table looks like a spreadsheet – here is a table with some Nobel laureates:\n\n| year | category | name | motivation |\n|------|------|------|------|\n| 1901 | chemistry | Jacobus Henricus van 't Hoff | in recognition of the extraordinary services he has rendered by the discovery of the laws of chemical dynamics and osmotic pressure in solutions |\n| 1901 | literature | Sully Prudhomme | in special recognition of his poetic composition, which gives evidence of lofty idealism, artistic perfection and a rare combination of the qualities of both heart and intellect |\n| 1901 | medicine | Emil Adolf von Behring | for his work on serum therapy, especially its application against diphtheria, by which he has opened a new road in the domain of medical science and thereby placed in the hands of the physician a victorious weapon against illness and deaths |\n| 1901 | physics | Wilhelm Conrad Röntgen | in recognition of the extraordinary services he has rendered by the discovery of the remarkable rays subsequently named after him |\n| 1902 | chemistry | Hermann Emil Fischer | in recognition of the extraordinary services he has rendered by his work on sugar and purine syntheses |\n| 1902 | literature | Christian Matthias Theodor Mommsen | the greatest living master of the art of historical writing, with special reference to his monumental work, A history of Rome |\n| 1902 | medicine | Ronald Ross | for his work on malaria, by which he has shown how it enters the organism and thereby has laid the foundation for successful research on this disease and methods of combating it |\n| 1902 | physics | Hendrik Antoon Lorentz | in recognition of the extraordinary service they rendered by their researches into the influence of magnetism upon radiation phenomena |\n| 1902 | physics | Pieter Zeeman | in recognition of the extraordinary service they rendered by their researches into the influence of magnetism upon radiation phenomena |\n| … | … | … | … |\n\nA row represents an item, and a column represents a property of the items –\nin the example above, each row describes a Nobel prize someone has been awarded, and for each such prize, we have columns showing what year the prize was awarded, in what category, the name of the laureate, and the motivation.\n\nThe first basic rule of relational databases is that all 'cells' in the table should be simple values (no lists or objects), and that we can use simple operations from relational algebra to get information from it (cells are *sometimes* allowed to have the value `NULL`, when a value is missing, we'll return to that below).\nTo work with our tables we use a programming language which is highly specialized for manipulating and extracting information, it is called SQL, which is short hand for Structured Query Language, and it's a [*Domain Specific Language*](https://en.wikipedia.org/wiki/Domain-specific_language) (DSL) for finding information in tables.\nSQL can be pronounced as either \"S-Q-L\", or \"sequel\".\n\n### Setting up this notebook\n\nThere are many different Relational Database Management Systems (RDMBS:es) which implements SQL, some of the most prominent are:\n\n-   [PostgreSQL](https://en.wikipedia.org/wiki/PostgreSQL)\n-   [MariaDB](https://en.wikipedia.org/wiki/MariaDB)\n-   [MySQL](https://en.wikipedia.org/wiki/MySQL)\n-   [Oracle](https://en.wikipedia.org/wiki/Oracle_Database)\n-   [Microsoft SQL Server](https://en.wikipedia.org/wiki/Microsoft_SQL_Server)\n-   [IBM DD2](https://en.wikipedia.org/wiki/IBM_Db2_Family)\n-   [SQLite](https://sqlite.org)\n-   [DuckDB](https://duckdb.org)\n\nMost of these systems are client-server-systems, i.e., they have one program, a SQL server, which handles the data, and clients who communicate with the server in various ways.\n\nThere are several different kinds of clients:\n\n-   We can run an IDE, which allows us to see our tables in a GUI.\n\n-   We can run command line clients (CLI) – they are text based programs who work like typical REPLs, output will just be text in a terminal window.\n\n-   We can write scripts which we send to the server, often through a CLI.\n\n-   We can run a notebook (such as this one), and have it communicate with our database.\n\n-   We can write code in a general purpose language, and have it communicate with our database.\n\nIn the course, we'll try all of these methods to access our databases.\n\nThe RDMBS we'll use in the course is SQLite, which is a lightweight but still very powerful system – it is *by far* the most used RDBMS, and it's probably already running on all of your phones and computers (just as an example, if you use Chrome for browsing, your browsing history is typically saved in a SQL-database file `.config/google-chrome/Default/History`, and Mozilla use it for storing meta-data in Firefox and Thunderbird).\nIt's actually not a client/server system (instead it is a library which keeps our databases in files on our computer) – but in the course, we'll think of SQLite as if it were a traditional client/server system, because in many ways, it behaves as one (and new tools like Litestream gives it some of the benefits of a client/server system).\n\nIn order to run SQL in this notebook, we need to load the SQL extension:\n\n… and then we want some database to work on (I've put all the databases used for this lecture in a file called `lect01.sqlite`):"
+		},
+		{
+			"id": "c68ee717-344b-4e1e-b7be-a0a512605146",
+			"type": "load",
+			"url": "https://sql.ebbe.dev/lect01/lect01.sqlite"
+		},
+		{
+			"id": "3efc094c-67ae-4ace-9006-cc18dacbdf21",
+			"type": "markdown",
+			"content": "Now we're good to go!\n\n### Using SQL to find information in a table (`SELECT`)\n\nIf we were to find out who were the Nobel laureates in 1910, we could just look through the lines of our table above, and *if the rows in the table were ordered by year*, it would be easy (that's essentially how mankind has used encyclopedias since they were invented about 2000 years ago).\n\nTo search for values in SQL, we use the `SELECT` statement:\n\n![image](https://sql.ebbe.dev/lect01/select-core-01-SFW.svg)\n\n(the diagram above is taken from SQLite's fabulous web site, you can find out more about the `SELECT` statement [here](https://sqlite.org/lang_select.html)).\n\nIf we follow the lines in the diagram above, we could puzzle together the query:"
+		},
+		{
+			"id": "5d6ba53c-8213-448d-9486-ab24a6137977",
+			"type": "sql",
+			"content": "SELECT   category, name\nFROM     nobel_prizes\nWHERE    year = 1910"
+		},
+		{
+			"id": "3db89308-22e1-49eb-a190-b2c3f47fa8e0",
+			"type": "markdown",
+			"content": "This will return a new table, looking like:\n\n| Category | Name |\n|------|------|\n| chemistry | Otto Wallach |\n| literature | Paul Johann Ludwig Heyse |\n| medicine | Albrecht Kossel |\n| physics | Johannes Diderik van der Waals |\n\nNobel prize was first awarded in 1901, so if we look for winners of the 1900 Nobel prizes, we would get an empty table back:"
+		},
+		{
+			"id": "bdab2a7b-16fd-4fa4-a7ed-a5eebefded32",
+			"type": "sql",
+			"content": "SELECT   category, name\nFROM     nobel_prizes\nWHERE    year = 1900"
+		},
+		{
+			"id": "2e8734d8-9118-4876-a858-e31c305abff8",
+			"type": "markdown",
+			"content": "SQL has a `NULL` value which is sometimes useful (we can use it to signal that one column in a row lacks a value), but observe that there is a *huge* difference between the empty table returned above, and `NULL` (if we had a Python or Java function which was given a list of strings and should return all of these strings which contained an uppercase letter, it should return *an empty list*, not `None` or `NULL`, if there were no such string).\n\n`NULL` values are only used for individual columns, and we could potentially have used it in our Nobel prize database if we had an award for which there was no motivation.\nLet's say the fictional poet Oddput Clementin was awarded the Nobel prize in literature in 2025 – since there is no way to explain why he got it it, we could set `motivation` to `NULL` in that case (we'll return to how we insert data into our tables later)."
+		},
+		{
+			"id": "8004f249-6da1-40c6-9947-e52faddab089",
+			"type": "sql",
+			"content": "INSERT\nINTO nobel_prizes (name, year, category, motivation)\nVALUES ('Oddput Clementin', 2025, NULL, NULL)"
+		},
+		{
+			"id": "c018a9ad-f85e-486e-8800-e6c0cca73a49",
+			"type": "markdown",
+			"content": "The value `NULL` itself is weird, in SQL the test `NULL = NULL` doesn't return `TRUE` or `FALSE`, it's `NULL` (but Jupyter writes that as `None`).\n\nSo the query:"
+		},
+		{
+			"id": "ee030a3f-558f-4691-8d9c-ea448d415955",
+			"type": "sql",
+			"content": "SELECT    year, category, name\nFROM      nobel_prizes\nWHERE     motivation = NULL"
+		},
+		{
+			"id": "ac56fc6e-6271-43f8-b201-bd68a0e16800",
+			"type": "markdown",
+			"content": "would always return an empty result.\n\nTo see if a value is `NULL`, we have to use the `IS` comparison:"
+		},
+		{
+			"id": "62f66537-4ba2-4968-a493-193139a74e95",
+			"type": "sql",
+			"content": "SELECT    year, category, name\nFROM      nobel_prizes\nWHERE     motivation IS NULL"
+		},
+		{
+			"id": "99ae28c6-2acf-4d55-897e-f46af1f8e24b",
+			"type": "markdown",
+			"content": "Despite it's weirdness, `NULL` can actually be useful in SQL, we'll return to this later.\n\nThe fact that we get tables back from our queries is very useful – we'll return to that too in a little while.\n\nIf we wanted to see only laureates in physics in 1910, we'd just refine the condition in our query:"
+		},
+		{
+			"id": "39127b20-59eb-4953-9fd7-aab82a45b19c",
+			"type": "sql",
+			"content": "SELECT   name\nFROM     nobel_prizes\nWHERE    year = 1910 and category = 'physics'"
+		},
+		{
+			"id": "6384daab-a25e-49ef-958b-b862ff71ccf8",
+			"type": "markdown",
+			"content": "**Problem:** How do we get all literature laureates in the 1920ies (see the [docs](https://sqlite.org/lang_select.html))?"
+		},
+		{
+			"id": "b0f1980e-8787-4cf0-b8fd-53d7155ffd3d",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "522b6ebf-5645-4d59-b44c-8f581b0de626",
+			"type": "markdown",
+			"content": "**Problem:** How do we order the literature laureates in the 1920ies by name?"
+		},
+		{
+			"id": "90edd454-bdc3-421b-b5b1-440534ea1e4f",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "7ab492dc-ab89-4831-abbd-ee79114a21f9",
+			"type": "markdown",
+			"content": "How do we get the search result above in reverse order?\n\n**Problem:** Show the first 10 Nobel prizes in chemistry."
+		},
+		{
+			"id": "141674a3-f685-429d-842f-d607b201f7fe",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "cad94650-07cb-4971-8316-1e1190d9b7ff",
+			"type": "markdown",
+			"content": "**Problem:** Show Nobel prize number 32 to 42 in medicine (in chronological order)."
+		},
+		{
+			"id": "1fba54be-50c6-4c0a-a050-df9d07870101",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "ecaf0c95-fa44-44e7-b5fb-6c1e6a9a0791",
+			"type": "markdown",
+			"content": "There is a subtlety here which we'll get back to below.\n\n**Problem:** What year did Albert Einstein get his award?"
+		},
+		{
+			"id": "6b581c12-7668-4c0f-9390-ce939b7cb4ff",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "dcd4e6e9-901f-444b-8301-5f6691441401",
+			"type": "markdown",
+			"content": "**Problem:** What year, and in what category did Churchill get his Nobel prize?"
+		},
+		{
+			"id": "5b643d89-bc4f-4552-86d4-06efc2fd97e4",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "320fade4-3164-4b9c-92ed-1f746f102542",
+			"type": "markdown",
+			"content": "Most databases have the `LIKE` predicate, quite a few also have some kind of regular expressions.\n\nBTW: representing a laureate as just a string is very primitive, next time we'll see how to represent compound data (the problem here is that the first rule of relational databases only allows primitive values in our cells).\n\n### Selecting only distinct values\n\nIf we wanted to see what categories are in our `nobel_prizes` table, we could write:"
+		},
+		{
+			"id": "670b02fe-83ae-4d04-be98-f207e47b94e0",
+			"type": "sql",
+			"content": "SELECT    category\nFROM      nobel_prizes"
+		},
+		{
+			"id": "e36585f9-fe0d-49fd-8536-375bfe10fd88",
+			"type": "markdown",
+			"content": "but we would get many repetitions. To see only the *distinct* values, we can use a `SELECT DISTINCT` query:"
+		},
+		{
+			"id": "671b8200-d4f2-42f2-90f8-fb27ca2000ff",
+			"type": "sql",
+			"content": "SELECT DISTINCT  category\nFROM             nobel_prizes"
+		},
+		{
+			"id": "86897e83-51f2-4786-bd8b-76c13cb9cdad",
+			"type": "markdown",
+			"content": "**Problem:** What categories of Nobel prizes were awarded in each of the years between 1910 and 1919?"
+		},
+		{
+			"id": "dde98a79-b156-477d-8429-826167eb4850",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "33ae7ad4-bd28-4c22-9ae9-126847c53362",
+			"type": "markdown",
+			"content": "Can you spot which prizes (year, category) were withheld?\nNext time we'll write a query to find all 'missing' prizes.\n\n### SQL scalar functions\n\nIn the [docs](https://sqlite.org/lang_select.html), we see that the general form of the `SELECT` statement allows a `result-column`, and that a `result-column` can contain an `expr`.\nThis opens up many, many possibilities (some of which we will get back to below), one of them is the use of simple scalar functions.\nWe can also use these functions in other places, such as in our `WHERE` or `ORDER BY` clauses.\n\nWe can se the standard *core functions* [here](https://sqlite.org/lang_corefunc.html), try to use them to do the following:\n\n**Problem:** Show the initial letter of each of the laureates in the year 2023."
+		},
+		{
+			"id": "248f4290-7809-4313-8915-da5bbf2e7ba7",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "97aa9da7-553e-4720-b8ea-a0fe70a996a9",
+			"type": "markdown",
+			"content": "**Problem:** Show the 10 first winners in the following format (see the `format`-function – unfortunately it will not look great in the notebook…):\n\n    1901: chemistry  Jacobus Henricus van 't Hoff\n    1901: literature Sully Prudhomme\n    1901: medicine   Emil Adolf von Behring\n    1901: physics    Wilhelm Conrad Röntgen\n    1902: chemistry  Hermann Emil Fischer\n    1902: literature Christian Matthias Theodor Mommsen\n    1902: medicine   Ronald Ross\n    1902: physics    Hendrik Antoon Lorentz\n    1902: physics    Pieter Zeeman\n    1903: chemistry  Svante August Arrhenius"
+		},
+		{
+			"id": "3cea5205-3204-434e-9c89-527e177be1ea",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "4e19ebf0-1988-4ba7-b0a9-0aa931ab1bf9",
+			"type": "markdown",
+			"content": "**Problem:** List the five laureates with the shortest names."
+		},
+		{
+			"id": "16d93a6e-3c6a-40bc-9347-f6a1f5deb556",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "2bf38a9f-25c0-4b63-9e51-f405443ad9b4",
+			"type": "markdown",
+			"content": "### SQL aggregate functions\n\nThe functions above were applied to one or more columns in a row, and they returned results for each row.\nThere is another kind of SQL function, called an *aggregate function*.\nAn aggregate function collapses a whole table (or part of it, see below) into one row – the SQLite docs list some aggregate functions [here](https://www.sqlite.org/lang_aggfunc.html).\n\nOne simple such function is `count(X)` – it counts the number of times an expression is not `NULL` in a column, so to see how many Nobel laureates we have in our database, we can write:"
+		},
+		{
+			"id": "7e8477f1-849e-417d-ad31-f83d801ee2b9",
+			"type": "sql",
+			"content": "SELECT    count(name)\nFROM      nobel_prizes;"
+		},
+		{
+			"id": "b5c3a67a-546d-4550-beaa-d123e0c842ea",
+			"type": "markdown",
+			"content": "This query returns just one row, with the count (what else could it have returned?).\n\nEach row in our `nobel_prize` table will have a defined `name` (there are no `NULL` values), and we can use an alternative version of the `count` function, which is just `count()` (without any argument), and it count each row, without checking possible `NULL` values.\n\nThere is also a nice `count()`-related trick which can be useful sometimes – if we only want to count how many *different* values we find in a column (or expression potentially containing several columns), we can use `count(DISTINCT X)`.\n\n**Problem:** How many *different* Nobel laurates are there?\n(We'll assume all laureates have different names, and up until now that's actually true.)"
+		},
+		{
+			"id": "e7a33c24-9865-407c-9f7f-d4181408cd4d",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "9dd9723c-65a7-42a2-a796-db5e150907ed",
+			"type": "markdown",
+			"content": "**Problem:** How many Nobel prizes were awarded in 2023?"
+		},
+		{
+			"id": "fc3f962b-e4e8-42bb-a402-d25bac5c267c",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "a9b140cf-ae38-4885-aa6b-e85b6985c023",
+			"type": "markdown",
+			"content": "**Problem:** How many different categories are there in the `nobel_prizes` table?"
+		},
+		{
+			"id": "b5e7134d-219f-433a-82cb-2e51e6054027",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "15901a94-f036-4507-b8ce-212f82b4bdf8",
+			"type": "markdown",
+			"content": "**Problem:** When was the first Nobel prize awarded?"
+		},
+		{
+			"id": "620ef3b7-8e74-4fcf-901b-4b5e8b873459",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "7a9eb5b0-a5d2-474f-ab6d-22c1d6ea0e2c",
+			"type": "markdown",
+			"content": "**Exercise:** How many Nobel prizes in chemistry have been awarded?"
+		},
+		{
+			"id": "a765ff9b-8e74-4ecf-a360-acc93ec19779",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "1928a670-ea6b-434f-8ecc-5b545ae0ee43",
+			"type": "markdown",
+			"content": "**Exercise:** How many different Nobel laureates in chemistry are there?"
+		},
+		{
+			"id": "2905fe1e-2852-40ec-bf06-afbbcb21d240",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "34adae62-19bf-48a2-8abe-1031183086cd",
+			"type": "markdown",
+			"content": "### `GROUP BY` and `HAVING`\n\nUsing `GROUP BY` we can handle rows in groups – to understand how it works, lets first look at the following query:"
+		},
+		{
+			"id": "14a4e922-3a73-49c7-9061-90c54fcd3494",
+			"type": "sql",
+			"content": "SELECT    category, name\nFROM      nobel_prizes\nWHERE     year = 2013\nORDER BY  category"
+		},
+		{
+			"id": "f1858e24-e078-4ad1-9cad-956b7c1cf4dc",
+			"type": "markdown",
+			"content": "Here the rows of each category will end up adjacent to each other, but if we want to see how many laureates we have in each category, we can't just call `count()`:"
+		},
+		{
+			"id": "819db8e7-474d-4f05-9b3f-7e010bcd881e",
+			"type": "sql",
+			"content": "SELECT    category, count()\nFROM      nobel_prizes\nWHERE     year = 2013\nORDER BY  category"
+		},
+		{
+			"id": "f5614436-2488-4e89-9117-24865b64ac6e",
+			"type": "markdown",
+			"content": "since the aggregate function `count()` collapses the resulting table into one row.\n\nBut if we use `GROUP BY`, we insert an invisible divider between groups of values, and perform any aggregate function only on each 'group':"
+		},
+		{
+			"id": "4c4f7f5c-1dce-4ac3-94fe-a9509b6f512d",
+			"type": "sql",
+			"content": "SELECT    category, count()\nFROM      nobel_prizes\nWHERE     year = 2013\nGROUP BY  category"
+		},
+		{
+			"id": "dcc30edc-9fab-4c21-aa9c-a857a144f610",
+			"type": "markdown",
+			"content": "So, if we apply an aggregate function, such as `count()`, in a table which we have grouped, the function will be applied to each group, not to the whole table, and instead of getting one `count()` for the whole table, we get one `count()` for each group (as above).\n\nIf we add `name` in the first line, we get a somewhat arbitrary result:"
+		},
+		{
+			"id": "68d6abf4-bef7-4fd9-8bc1-6a9a136268e9",
+			"type": "sql",
+			"content": "SELECT    category, count(), name\nFROM      nobel_prizes\nWHERE     year = 2013\nGROUP BY  category"
+		},
+		{
+			"id": "b2a53e61-7fb6-4586-9397-eede73feca4e",
+			"type": "markdown",
+			"content": "The category and count is correct, but only one name is shown for each category.\n\nThe 'problem' is that we only get one row per group in the output, and that there may be several laureates in each group – our query will return one of them in a seemingly haphazard manner.\nTo alleviate this problem, SQLite defines an aggregate function [`group_concat`](https://www.sqlite.org/lang_aggfunc.html#group_concat), which concatenates all values in the group (it also has the alias `string_agg`, to match the corresponding function in PostgreSQL):"
+		},
+		{
+			"id": "334e260f-3daa-48b9-811d-82730767525d",
+			"type": "sql",
+			"content": "SELECT    category, count(), group_concat(name, \", \") AS \"names\"\nFROM      nobel_prizes\nWHERE     year = 2013\nGROUP BY  category"
+		},
+		{
+			"id": "73b5dac9-4fe3-4201-be92-4d6ff20803a3",
+			"type": "markdown",
+			"content": "In recent versions of SQLite it's also possible to order the values in an aggregate function such as `group_concat` by using `ORDER BY` inside the function call (see the [docs](https://www.sqlite.org/lang_aggfunc.html)).\n\nObserve that there is no problem displaying `category` in the SELECT-statement above, we get a value which we know will be the same for each row in the group (this is by definition, since that's what we grouped by).\n\nIf we're only interested in those categories with less than three laureates, we use `HAVING` to select only groups with a given property:"
+		},
+		{
+			"id": "2a85924e-7b76-42f3-82ef-4041f7a7f23c",
+			"type": "sql",
+			"content": "SELECT    category, count(), group_concat(name, \", \") AS \"names\"\nFROM      nobel_prizes\nWHERE     year = 2013\nGROUP BY  category\nHAVING    count() < 3"
+		},
+		{
+			"id": "d86d1522-2742-47e1-a586-eab9b99e6f57",
+			"type": "markdown",
+			"content": "This corresponds to a `WHERE` statement, *but it applies to groups*, not to individual rows (as `WHERE` does) – so `WHERE` and `HAVING` have similar effects (they somehow narrow a search), *but they're absolutely not interchangable!*\n\nImportant (and often misunderstood): In the query above we first have a `WHERE` statement to select some rows from the whole table, and then group the resulting selection – this can be seen in this diagram:\n\n![image](https://sql.ebbe.dev/lect01/select-00-overview.svg)\n\nEvery time we have both a `WHERE` and a `HAVING` in the same query, we must first use `WHERE` to select rows we can group, and then use `HAVING` to select groups.\nWe can use `WITH` statements or subqueries (see below) if we want to have it the other way around.\n\n**Problem:** Has anyone won more than one Nobel prize? We can assume the names of the laureates are unique (so far they are)."
+		},
+		{
+			"id": "c137d194-696e-4fa3-a6c8-2427f07b55bf",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "c3ec1503-f23b-46e6-b718-46fd661748c0",
+			"type": "markdown",
+			"content": "**Problem:** How many laureates are there in each category?"
+		},
+		{
+			"id": "483de5e9-dea2-4877-8914-c7d29444c93a",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "dcb24b99-6962-4b4d-a52d-683ea7d3bf87",
+			"type": "markdown",
+			"content": "**Problem:** Which categories have had more than 200 laureates?"
+		},
+		{
+			"id": "a387b675-f938-4f8b-b276-6666154d9137",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "925aa4a8-d9f3-4f9f-86e1-40eeb90b57bd",
+			"type": "markdown",
+			"content": "**Exercise:** How many laureates were there each year between 1920 and 1930?"
+		},
+		{
+			"id": "e0169355-e19d-42ff-bbf9-ac17d7206c26",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "cbe19c62-9c2e-45f5-873b-917cb265e5aa",
+			"type": "markdown",
+			"content": "**Exercise:** Which years saw more than 9 laureates?"
+		},
+		{
+			"id": "bf72c22b-4f30-4b1a-bec8-d73f8ee6df1c",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "489da917-d3a6-41a5-9f30-f26e441e4811",
+			"type": "markdown",
+			"content": "Can you also show who the laureates were in those years, and even better, for each of them also show in which category they were awarded.\n\n**Exercise:** Which have been the 20 years with most laureates? (We don't need to be precise in case of ties.)"
+		},
+		{
+			"id": "bd975eb5-3437-4055-8f39-a6995d0fc7ad",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "a9d55ab5-88e4-4e1a-abe1-69554f9f1914",
+			"type": "markdown",
+			"content": "#### Using `CASE WHEN`\n\nWhen we group values, we can make use of the `CASE WHEN` construct (see the penultimate track in the diagram below):\n\n![image](https://sql.ebbe.dev/lect01/select-expr.svg)\n\nFor instance, we can use it to categorize the era for each of the physics laureates having a name beginning with 'A':"
+		},
+		{
+			"id": "e98a06f5-cfa0-45d7-aeca-47463f9f05d2",
+			"type": "sql",
+			"content": "SELECT   year, name,\n         CASE\n             WHEN year < 1970 THEN 'ancient era'\n             WHEN year <= 2000 THEN 'a long time ago'\n             ELSE 'quite recently'\n         END AS era\nFROM     nobel_prizes\nWHERE    category = 'physics' AND name LIKE 'A%'"
+		},
+		{
+			"id": "c5539da8-85f3-47b2-aa77-a32cd68e2b0d",
+			"type": "markdown",
+			"content": "**Problem:** Use the `CASE WHEN` construct and `GROUP BY` to count the number of physics laureates beginning with 'A' in each era."
+		},
+		{
+			"id": "2d95d5fe-12d3-460d-88bc-865f2677c848",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "300f1315-89be-4f75-bb13-5cd374570e16",
+			"type": "markdown",
+			"content": "### Window functions\n\nAs we saw above, we can treat partitions of our rows as 'groups', by using `GROUP BY`.\n\nWe also saw than when we use an aggregate function on a group, we collapse whole groups into one row in the output (and when we apply it to a table without groups, the whole table collapses into one row) – but sometimes we want to apply aggregate functions within a group of values, *and keep each row in the output*.\n\nAbove we listed all laureates in 2013, now we want to add one column to the output: for each laureate, we want to show how many laureates shared the prize in her or his category.\n\nIf we use `GROUP BY` and the aggregate function `count()` on the categories, we would only get one row per category, and using `count()` without grouping would collapse the whole result into just one row:"
+		},
+		{
+			"id": "43e6e269-9118-4c8d-8729-a8936055ef77",
+			"type": "sql",
+			"content": "SELECT    category, name, count() AS count      -- oh no!\nFROM      nobel_prizes\nWHERE     year = 2013\nORDER BY  category"
+		},
+		{
+			"id": "18239749-522f-478d-b7bc-3b490055d000",
+			"type": "markdown",
+			"content": "Fortunately, SQL has a way to apply functions only over 'partitions' of our tables, and keep all rows in the output – using the reserved word `OVER` we can introduce a 'window' of our rows, and apply the function only over this window:"
+		},
+		{
+			"id": "9014b02f-9904-4157-9d67-fbb3763e54d9",
+			"type": "sql",
+			"content": "SELECT    category,\n          name,\n          count() OVER (PARTITION by category) AS count\nFROM      nobel_prizes\nWHERE     year = 2013\nORDER BY  category"
+		},
+		{
+			"id": "a4daeb9b-b946-48d3-9100-f8da8515a6d5",
+			"type": "markdown",
+			"content": "We can also give our windows names, using an alias:"
+		},
+		{
+			"id": "67e740d0-9805-4576-8749-d1c5f8115add",
+			"type": "sql",
+			"content": "SELECT    category,\n          name,\n          count() OVER categories AS count\nFROM      nobel_prizes\nWHERE     year = 2013\nWINDOW    categories AS (PARTITION by category)\nORDER BY  category"
+		},
+		{
+			"id": "75653daa-199b-4300-8af9-ee3b6165b040",
+			"type": "markdown",
+			"content": "The aliased window definitions must come after any `WHERE` and `HAVING`, and before any `ORDER BY`.\n\nSo, if we use the reserved word `OVER` after a function, the function will be applied according to a 'window' (there is more to it than this, but this will suffice for now).\nIn the window we can:\n\n-   define a partition, using `PARTITION BY`,\n\n-   define an order, using `ORDER BY`, and\n\n-   define a range, which we can use to define groups of rows relative to each other (but we won't look at ranges in the course).\n\nThe function will be applied to each partition, in the same way we applied aggregate functions on groups above, but now we won't collapse the partitions.\nObserve that the partitioning and ordering are based only on the selection we make (i.e., only those rows which are chosen in our `WHERE` clause).\n\nWe can use our regular aggregate functions as window functions, but there are also a couple of dedicated window functions, such as (there are more, but we won't use them in the course):\n\n-   `rank()`: ranks rows by the order specified in the window, ties can occur,\n\n-   `row_number()`: as `rank()`, but now we avoid ties, and rank by row number in the output, and\n\n-   `percent_rank()`: gives a value between 0.0 and 1.0 (so it's a bit of a misnomer), giving the row's relative rank within its partition.\n\nYou can find more [here](https://sqlite.org/windowfunctions.html).\n\n**Problem:** Add one column which 'ranks' the laureates of 2013 in the table above according to the lengths of their names, within the categories – shorter names should come before longer names."
+		},
+		{
+			"id": "fe22f0a8-bcb7-4370-8c42-7d5671d7ed50",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "1176d5be-608b-4e59-818e-1833a5505bfe",
+			"type": "markdown",
+			"content": "**Exercise:** Above we listed Nobel prize number 32 to 42 in medicine, in chronological order, but our only way to check that our numbering is correct would be to list all the first laureates, and then count manually.\nNow use a window function to enhance the output from the query above with the chronological order of each laureate."
+		},
+		{
+			"id": "6fd07208-367c-419c-8927-65ad4d0dcdb9",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "18caab89-f242-4fa2-ac03-a3f8d0ac81ed",
+			"type": "markdown",
+			"content": "**Exercise:** For each laureate with the initial A, list their category, year, name, and 'freshness' within that category, i.e., the most recent laureate in a category is ranked 1, the second most recent laureate is ranked 2, etc. The ranks should be confined to laureates with the initial A (we need some more tools to rank the 'freshness' over the whole category, but will get to it next time)."
+		},
+		{
+			"id": "5c3fee4c-3ecb-451e-8ed0-dadc2af473ce",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "9fc24e2d-33ca-4df8-99a1-50533be160e0",
+			"type": "markdown",
+			"content": "### Some exercises\n\nTo spice things up a bit, I've included a table with all olympic games since 1896 – the table `olympics` contains the columns:\n\n-   `year`\n-   `city`\n-   `country`\n-   `continent`\n-   `season`\n-   `ordinal_number`\n\nIf we look carefully at this table, we can find some unnecessary repetition (try to find it!) – we will address this problem during lecture 2, but for now, we'll let it pass.\n\n**Exercise:** How many olympic games have each continent hosted?"
+		},
+		{
+			"id": "fd2fce53-8ab8-4e5e-9b50-c63c8de43801",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "f0f39383-fca7-47b5-a0bf-bdb7c8a9206a",
+			"type": "markdown",
+			"content": "**Exercise:** When was the first olympic games in each continent?"
+		},
+		{
+			"id": "b66e400b-aa1c-496a-8c68-a3d6168058d2",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "5217d959-12fa-4165-b7d2-f566c3eb2fd0",
+			"type": "markdown",
+			"content": "**Exercise:** Which countries have hosted the summer olympics more than once?"
+		},
+		{
+			"id": "a2c713c0-acdc-44b8-b08c-4434fc2a500b",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "6adc6af0-8331-4386-bb2f-35c4bdbe7a3e",
+			"type": "markdown",
+			"content": "**Exercise:** List the continents in descending order by the number of times they've hosted the summer olympics"
+		},
+		{
+			"id": "f7fbe9c6-df84-465a-be4d-44b43dd8b999",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "4a6335de-32de-417a-a25d-ec0098acbcd7",
+			"type": "markdown",
+			"content": "**Exercise:** Show a 'histogram' (no actual diagram, just the counts) over the the initial letter of the names of all Nobel laureates (see how big your chance is…)."
+		},
+		{
+			"id": "2b7d6726-5f15-400e-9149-ee1f235b4250",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "ef38228e-c35c-4c7a-8eb5-46ac131c4890",
+			"type": "markdown",
+			"content": "**Exercise:** Show a 'histogram' over the the initial letter of the names of all Nobel laureates, *for each category*."
+		},
+		{
+			"id": "d22f87be-9643-46d3-8fa5-15d32449b227",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "118b2d54-3fe0-45f9-b816-2f1aec2d473e",
+			"type": "markdown",
+			"content": "**Exercise:** Has anyone won more than one Nobel prize in the same category?"
+		},
+		{
+			"id": "2be9af64-c4d4-455c-baa6-0a41f60b065a",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "01fc15f9-366c-47f0-a885-262bc51001ca",
+			"type": "markdown",
+			"content": "To find out if someone has won in more than one category, we need a subquery (see below).\n\n**Exercise:** For each olympic game, show how many olympic games had come before it in its continent. (Requires window functions)"
+		},
+		{
+			"id": "c02542b4-c5a4-4452-a4f4-e207835f2b52",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "f6466109-aeea-4717-a29b-cd18018b7330",
+			"type": "markdown",
+			"content": "### Subqueries, Views and Common Table Expressions (CTEs)\n\nAs we noted above, the result of a `SELECT` statement is itself a (kind of) table, and we can use such a table inside other [`SELECT` statements](https://sqlite.org/lang_select.html).\n\nOne useful pattern is:\n\n    SELECT ...\n    FROM   ...\n    WHERE  ... IN\n           (SELECT ...\n            FROM ...\n            WHERE ...)\n\nThe second, nested query is called a *subquery*.\n\nWe'll use a subquery to find all literature laureates who split their prizes – to do it we begin with a regular query, to find which years the Nobel prize for literature were split?"
+		},
+		{
+			"id": "a2d86786-eeea-40df-a294-e8417cc68e66",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "e57f26b5-7ac5-49ad-aabc-c0a30fb8a56f",
+			"type": "markdown",
+			"content": "… and now we use the result of that query to find out what we're really looking for:"
+		},
+		{
+			"id": "4c0de445-2409-43cb-8cbe-43787f1c792d",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "2414c464-f164-4eac-9f8e-25570db8f394",
+			"type": "markdown",
+			"content": "This can be simplified by using either of two ways to define 'temporary tables':\n\n-   *views*\n-   *Common Table Expressions* (CTE:s).\n\nA *view* can be seen as a new table, containing the result of a query – to create a view with the years where the literature prize was shared, we can write:"
+		},
+		{
+			"id": "26b52fe8-d095-49ee-a6b8-8c116019b49b",
+			"type": "sql",
+			"content": "CREATE VIEW shared_literature_prize(year) AS\n  SELECT ... -- just as above..."
+		},
+		{
+			"id": "b8589fb0-2f70-4f3c-865c-6e7b6440e557",
+			"type": "markdown",
+			"content": "We can now use our view in a query:"
+		},
+		{
+			"id": "1366d58d-a446-4fcc-a90a-26b4bcae7cc1",
+			"type": "sql",
+			"content": "SELECT    year, name\nFROM      nobel_prizes\nWHERE     category = 'literature'\n          AND year IN (\n            SELECT    year\n            FROM      shared_literature_prize\n          )"
+		},
+		{
+			"id": "d21d0bb1-b6a1-45f2-ac9f-cc7afe09b9c7",
+			"type": "markdown",
+			"content": "There is only one attribute in our `shared_literature_table`, and we can simplify this expression:"
+		},
+		{
+			"id": "7defb267-cb9e-4693-b15a-f8b469840b40",
+			"type": "sql",
+			"content": "SELECT    year, name\nFROM      nobel_prizes\nWHERE     category = 'literature'\n          AND year IN shared_literature_prize"
+		},
+		{
+			"id": "c4c70e8e-56cf-433c-ac8e-1ddf12c0216e",
+			"type": "markdown",
+			"content": "If we have more than one column in the output of the subquery, we must compare it to a tuple within parentheses (this is a quite new addition to SQL, so it might not work everywhere).\n\nThe view will be around until we decide to remove it with:"
+		},
+		{
+			"id": "7e775c40-c34d-47c5-bece-15a2a6441971",
+			"type": "sql",
+			"content": "DROP VIEW shared_literature_prize"
+		},
+		{
+			"id": "8212eabc-7619-4a3a-8ef8-6f475577800d",
+			"type": "markdown",
+			"content": "A view isn't actually a table – each time the view is used it runs its query, which will take some time, but it means we get all updates in the underlying table(s).\n\nA *Common Table Expression* (or *CTE*) is like a view, but only defined as part of a query, so we'd write it like:"
+		},
+		{
+			"id": "e5f1012d-f276-4183-a96b-ed75f25e404d",
+			"type": "sql",
+			"content": "WITH\n  shared_literature_prize(year) AS (\n    SELECT ... -- as above...\n  )\nSELECT    year, name\nFROM      nobel_prizes\nWHERE     category = 'literature'\n          AND year IN shared_literature_prize"
+		},
+		{
+			"id": "6d760b86-0bba-47ad-a89f-2c95d4cc7884",
+			"type": "markdown",
+			"content": "There are some things which makes CTEs very nice:\n\n-   they're defined as part of a `SELECT` statement (so there is nothing to drop afterwards),\n-   since they're part of a `SELECT` statement, we only need one statement (which will become useful when we call our database remotely, we'll return to that later in the course), and\n-   they can be defined recursively (we'll return to that too later in the course).\n\n**Problem:** Show the years and categories for recurring laureates (i.e., laureates who has won more than once) – use a CTE to do it."
+		},
+		{
+			"id": "2b159ee0-d21a-4986-95a9-e91d0782ac53",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "e6385e34-2b1e-4be1-b65e-a677c30f6494",
+			"type": "markdown",
+			"content": "**Exercise:** Who has won the literature prize in a year when at least one chemistry laureate had a name beginning with 'L'? First try to solve this with a regular subquery:"
+		},
+		{
+			"id": "224c9792-5661-435b-a2d4-86446c66d0f5",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "60f3f3f0-6ae7-4714-9352-e0e9e253a5e5",
+			"type": "markdown",
+			"content": "… and then rewrite it using a CTE:"
+		},
+		{
+			"id": "00cd39f3-11f6-4bc0-9e8d-908175a6a4c3",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "2810d85a-2833-4964-9dbc-b049ca4ec49b",
+			"type": "markdown",
+			"content": "We saw above that we can't have another `WHERE` after the `HAVING` clause:"
+		},
+		{
+			"id": "7c01511f-24cf-4e67-89e5-994798ec82f1",
+			"type": "sql",
+			"content": "SELECT    category, count() AS count\nFROM      nobel_prizes\nWHERE     year = 2013\nGROUP BY  category\nHAVING    count() < 3\nWHERE     count > 1        --   <-- not allowed!"
+		},
+		{
+			"id": "a0223e42-c4ad-4141-9c9b-8c1d4ac3b353",
+			"type": "markdown",
+			"content": "but we can make our 'grouping query' into a subquery, and have another `WHERE` in the outer query:"
+		},
+		{
+			"id": "810ecb41-a13a-4767-b58d-ec99a4d1c56b",
+			"type": "sql",
+			"content": "SELECT category, count\nFROM (\n    SELECT    category, count() AS count\n    FROM      nobel_prizes\n    WHERE     year = 2013\n    GROUP BY  category\n    HAVING    count() < 3)\nWHERE  count > 1"
+		},
+		{
+			"id": "6835a4d8-f69c-4632-9ca4-0160432bc64e",
+			"type": "markdown",
+			"content": "A somewhat tidier way of expressing this is to use a WITH-statement (CTE):"
+		},
+		{
+			"id": "df39c9e5-c313-4b2e-80c0-78cdaa704ac1",
+			"type": "sql",
+			"content": "WITH category_count(category, count) AS (\n    SELECT    category, count()\n    FROM      nobel_prizes\n    WHERE     year = 2013\n    GROUP BY  category\n    HAVING    count() < 3\n)\nSELECT category, count\nFROM   category_count\nWHERE  count > 1"
+		},
+		{
+			"id": "7797d6d0-7cec-4913-858a-8fb66d454de4",
+			"type": "markdown",
+			"content": "**Exercise**: How many *different* laureates do we have in each category?\nObserve that there are a couple of laureates with two awards in the same category, they should only be counted once – Marie Curie, on the other hand, has won in two categories, so she should be counted in two different categories.\nUse a CTE to keep track of all laureates in each category."
+		},
+		{
+			"id": "2595e126-e426-4abc-b230-534835a20501",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "0547c126-7714-49b1-b48c-f14dbb9bcca7",
+			"type": "markdown",
+			"content": "**Exercise**: Above we wrote a query to find laureates who hade more than one award in a category, now write a query to find laureates who has won in more than one category."
+		},
+		{
+			"id": "b30f0a4b-eb23-478f-a174-f183d6ae8e7a",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "a96b1de7-b067-4606-81a4-4c541bf89cd8",
+			"type": "markdown",
+			"content": "**Problem:** There is a very handy function which returns a series of values – it's called [`generate_series`](https://www.sqlite.org/series.html), and you can try to use it to see which years from 1901 until now when no Nobel price at all ware awarded."
+		},
+		{
+			"id": "d01dca0b-4cd6-48e3-91ba-002475df0ef0",
+			"type": "sql",
+			"content": ""
+		},
+		{
+			"id": "77cb48ea-1f47-46bc-98c4-7fc278998991",
+			"type": "markdown",
+			"content": "#### Correlated subqueries\n\nAnother form of subquery allows us to correlate two `SELECT` statements, so that we use values from an outer `SELECT` statement inside the `SELECT` statement in a subquery. As an example, solve the following problem:\n\n**Problem:** List the names of all laureates who have the longest name of all laureates in their categories (in case of ties, all should be listed) – order by category.\n\nHere we can use a subquery which is 'run' for each row in our main query:"
+		},
+		{
+			"id": "2311f6a9-666a-4d03-a3af-ba333199d538",
+			"type": "sql",
+			"content": "SELECT  category, year, name\nFROM    nobel_prizes AS outer_nobel\nWHERE   length(name) = (\n            SELECT max(length(name))\n            FROM   nobel_prizes\n            WHERE  category = outer_nobel.category)\nORDER BY category"
+		},
+		{
+			"id": "03d3faf6-220e-45bb-be12-c521fa504eaa",
+			"type": "markdown",
+			"content": "This is called a correlated subquery (since we refer to the enclosing query inside it). We use an alias to distinguish between the `nobel_prizes` table in the outer query and the `nobel_prizes` table in the subquery (it's the same table, but we 'iterate' through it separately).\n\nBTW, we could have skipped the `AS` in\n\n    ...\n    FROM    nobel_prizes AS outer_nobel\n    ...\n\nand just written:\n\n    ...\n    FROM    nobel_prizes outer_nobel\n    ...\n\nThe general opinion is that we should use `AS`, as it makes it more obvious that we're defining an alias."
+		}
+	]
 }
