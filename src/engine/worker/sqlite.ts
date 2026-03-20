@@ -22,12 +22,14 @@ export const getDb = async (): Promise<[Database, Sqlite3Static]> => {
 
 export const query = async (sql: string): Promise<CellResult> => {
 	const [currentDb] = await getDb();
+	const columns: string[] = [];
 	const rows = currentDb.exec(sql, {
 		rowMode: 'object',
 		returnValue: 'resultRows',
+		columnNames: columns,
 	});
 	const rowsAffected = currentDb.changes();
-	return { kind: 'table', rows, rowsAffected };
+	return { kind: 'table', rows, columns, rowsAffected };
 };
 
 export const loadFromUrl = async (url: string): Promise<void> => {

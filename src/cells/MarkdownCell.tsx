@@ -3,6 +3,7 @@ import { EditorView } from '@codemirror/view';
 import CodeMirror from '@uiw/react-codemirror';
 import { FaMarkdown } from 'react-icons/fa6';
 import Markdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { useTheme } from '@/components';
 import { useSheetStore } from '@/store';
 import type { MarkdownCellData } from '@/store/types';
@@ -41,7 +42,7 @@ export const MarkdownCell = ({
 					}
 				/>
 			) : (
-				<Markdown>{cellData.content}</Markdown>
+				<Markdown remarkPlugins={[remarkGfm]}>{cellData.content}</Markdown>
 			)}
 		</CellShell>
 	);

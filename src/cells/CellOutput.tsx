@@ -12,11 +12,11 @@ export const CellOutput = ({ result }: CellOutputProps) => {
 		case 'table':
 			return (
 				<section className={styles.result}>
-					{result.rows.length > 0 ? (
-						<table className={styles.resultTable}>
+					{result.columns.length > 0 ? (
+						<table>
 							<thead>
 								<tr>
-									{Object.keys(result.rows[0]).map((col) => (
+									{result.columns.map((col) => (
 										<th key={col}>{col}</th>
 									))}
 								</tr>
@@ -25,9 +25,9 @@ export const CellOutput = ({ result }: CellOutputProps) => {
 								{result.rows.map((row, i) => (
 									// biome-ignore lint/suspicious/noArrayIndexKey: No stable key available
 									<tr key={i}>
-										{Object.values(row).map((val, j) => (
+										{result.columns.map((col, j) => (
 											// biome-ignore lint/suspicious/noArrayIndexKey: Positional
-											<td key={j}>{String(val ?? '')}</td>
+											<td key={j}>{String(row[col] ?? '')}</td>
 										))}
 									</tr>
 								))}

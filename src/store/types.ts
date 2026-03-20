@@ -4,6 +4,7 @@ export type CellResult =
 	| {
 			kind: 'table';
 			rows: { [columnName: string]: SqlValue }[];
+			columns: string[];
 			rowsAffected: number;
 	  }
 	| { kind: 'text'; text: string }
