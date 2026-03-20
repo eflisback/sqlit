@@ -54,7 +54,7 @@ export const ExecutableCell = ({
 	const { isLoading, anyRunning, status, run, runWithPrior, showRunWithPrior } =
 		useRunCell(cellData);
 	const ref = useRef<HTMLDivElement>(null);
-	const runningCellId = useSheetStore((s) => s.runningCellId);
+	const runningCellId = useSheetStore((state) => state.runningCellId);
 
 	useEffect(() => {
 		if (runningCellId === cellData.id) {

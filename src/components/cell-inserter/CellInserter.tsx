@@ -12,7 +12,7 @@ interface CellInserterProps {
 }
 
 export const CellInserter = ({ index }: CellInserterProps) => {
-	const insertCell = useSheetStore((s) => s.insertCell);
+	const insertCell = useSheetStore((state) => state.insertCell);
 
 	const insert = (type: 'markdown' | 'sql' | 'python' | 'load') => {
 		const id = crypto.randomUUID();

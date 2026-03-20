@@ -4,8 +4,8 @@ import { CellOutput } from './CellOutput';
 import styles from './cells.module.css';
 
 export const LoadCell = ({ cellData }: { cellData: LoadCellData }) => {
-	const isEditable = useSheetStore((s) => s.isEditable);
-	const updateCell = useSheetStore((s) => s.updateCell);
+	const isEditable = useSheetStore((state) => state.isEditable);
+	const updateCell = useSheetStore((state) => state.updateCell);
 
 	return (
 		<>
