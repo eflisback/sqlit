@@ -43,8 +43,8 @@ export const CellOutput = ({ result }: CellOutputProps) => {
 				</section>
 			);
 		case 'text':
-			return <p className={styles.status}>{result.text}</p>;
+			return <p className={styles.status}>{result.text.trim()}</p>;
 		case 'error':
-			return <section className={styles.error}>{result.message}</section>;
+			return <pre className={styles.error}>{result.message.trim()}</pre>;
 	}
 };
