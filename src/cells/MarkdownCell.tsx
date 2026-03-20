@@ -45,7 +45,9 @@ export const MarkdownCell = ({
 				extensions={[markdown(), EditorView.lineWrapping]}
 				onChange={handleChange}
 			/>
-			<div className={`${styles.markdownContent}${isEditable ? ` ${styles.hidden}` : ''}`}>
+			<div
+				className={`${styles.markdownContent}${isEditable ? ` ${styles.hidden}` : ''}`}
+			>
 				<Markdown remarkPlugins={[remarkGfm]}>{cellData.content}</Markdown>
 			</div>
 		</CellShell>

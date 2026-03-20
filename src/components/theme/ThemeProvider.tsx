@@ -9,7 +9,7 @@ interface ThemeContextValue {
 
 export const ThemeContext = createContext<ThemeContextValue | null>(null);
 
-const STORAGE_KEY = 'sqliteler-theme';
+const STORAGE_KEY = 'sqlit-theme';
 
 function getInitialTheme(): Theme {
 	const stored = localStorage.getItem(STORAGE_KEY);

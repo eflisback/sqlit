@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import type { IconType } from 'react-icons';
 import {
 	FaDatabase,
-	FaFileImport,
+	FaFileArrowDown,
 	FaForward,
 	FaPlay,
 	FaPython,
@@ -32,7 +32,7 @@ const cellMeta: Record<
 			'Contains Python code executed via Pyodide with access to the SQLite database.',
 	},
 	load: {
-		Icon: FaFileImport,
+		Icon: FaFileArrowDown,
 		label: 'load',
 		information:
 			'Loads existing SQLite database files into the in-memory SQLite database.',

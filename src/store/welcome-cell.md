@@ -1,4 +1,4 @@
-# Welcome to SQLiteler!
+# Welcome to sqlit!
 
 This tool let's you execute _SQL queries_ and _Python code_ directly in your browser with **zero setup**. It does this using...
 

@@ -50,10 +50,13 @@ export const Header = () => {
 
 	return (
 		<header className={styles.header}>
-			<section>Logo</section>
+			<section className={styles.logo}>
+				<img src='/logo.svg' alt='sqlit logo' />
+				<span>sqlit</span>
+			</section>
 			<section>
 				<a
-					href='https://github.com/eflisback/sqliteler'
+					href='https://github.com/eflisback/sqlit'
 					target='_blank'
 					className={styles.version}
 					rel='noopener'
