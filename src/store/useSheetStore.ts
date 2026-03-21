@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { importSheetMd } from './sheetFile';
 import type { CellData } from './types';
 import { isExecutableCellData } from './types';
-import welcomeCell from './welcome-cell.md?raw';
+import welcomeContent from './welcome.sqlit.md?raw';
 
 interface SheetStore {
 	cells: CellData[];
@@ -20,32 +21,9 @@ interface SheetStore {
 export const useSheetStore = create<SheetStore>()(
 	persist(
 		(set) => ({
-			cells: [
-				{
-					id: 'welcome-markdown',
-					type: 'markdown',
-					content: welcomeCell,
-				},
-				{
-					id: 'welcome-load',
-					type: 'load',
-					url: `${window.location.origin}/examples/users.sqlite`,
-					result: null,
-				},
-				{
-					id: 'welcome-sql',
-					type: 'sql',
-					content: 'SELECT * FROM users',
-					result: null,
-				},
-				{
-					id: 'welcome-python',
-					type: 'python',
-					content:
-						'import sqlite3\n\ncon = sqlite3.connect(SQLIT_MEMORY) # Provided by sqlit \ncur = con.cursor()\nfor row in cur.execute("SELECT * FROM users"):\n    print(row)',
-					result: null,
-				},
-			],
+			cells: importSheetMd(
+				welcomeContent.replace('{{ORIGIN}}', window.location.origin),
+			),
 			insertCell: (cellData, index) =>
 				set((prev) => ({
 					cells: [

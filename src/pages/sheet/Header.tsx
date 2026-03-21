@@ -9,7 +9,7 @@ import {
 	FaSun,
 } from 'react-icons/fa6';
 import { useTheme } from '@/components';
-import { exportSheet, importSheet, useSheetStore } from '@/store';
+import { exportSheetMd, importSheetMd, useSheetStore } from '@/store';
 import { version } from '../../../package.json';
 import styles from './Sheet.module.css';
 
@@ -22,12 +22,12 @@ export const Header = () => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleExport = () => {
-		const json = exportSheet(cells);
-		const blob = new Blob([json], { type: 'application/json' });
+		const md = exportSheetMd(cells);
+		const blob = new Blob([md], { type: 'text/markdown' });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');
 		a.href = url;
-		a.download = 'sheet.json';
+		a.download = 'sheet.sqlit.md';
 		a.click();
 		URL.revokeObjectURL(url);
 	};
@@ -38,7 +38,7 @@ export const Header = () => {
 		const reader = new FileReader();
 		reader.onload = () => {
 			try {
-				const imported = importSheet(reader.result as string);
+				const imported = importSheetMd(reader.result as string);
 				loadCells(imported);
 			} catch {
 				alert('Failed to import sheet: invalid or malformed file.');
@@ -77,7 +77,7 @@ export const Header = () => {
 				<input
 					ref={fileInputRef}
 					type='file'
-					accept='.json'
+					accept='.sqlit.md'
 					style={{ display: 'none' }}
 					onChange={handleImport}
 				/>
