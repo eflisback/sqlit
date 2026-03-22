@@ -58,6 +58,12 @@ export const useSheetStore = create<SheetStore>()(
 		}),
 		{
 			name: 'sheet',
+			version: 1,
+			migrate: () => ({
+				cells: importSheetMd(
+					welcomeContent.replace('{{ORIGIN}}', window.location.origin),
+				),
+			}),
 			partialize: (state) => ({
 				cells: state.cells.map(
 					(cell): CellData =>
