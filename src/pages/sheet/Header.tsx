@@ -1,11 +1,9 @@
 import { useRef } from 'react';
 import {
-	FaEye,
 	FaFileExport,
 	FaFileImport,
 	FaGitAlt,
 	FaMoon,
-	FaPen,
 	FaSun,
 } from 'react-icons/fa6';
 import { useTheme } from '@/components';
@@ -15,8 +13,6 @@ import styles from './Sheet.module.css';
 
 export const Header = () => {
 	const { theme, setTheme } = useTheme();
-	const isEditable = useSheetStore((state) => state.isEditable);
-	const setIsEditable = useSheetStore((state) => state.setIsEditable);
 	const cells = useSheetStore((state) => state.cells);
 	const loadCells = useSheetStore((state) => state.loadCells);
 	const fileInputRef = useRef<HTMLInputElement>(null);
@@ -74,19 +70,6 @@ export const Header = () => {
 					style={{ display: 'none' }}
 					onChange={handleImport}
 				/>
-				<button type='button' onClick={() => setIsEditable(!isEditable)}>
-					{isEditable ? (
-						<>
-							<FaEye />
-							<span>View mode</span>
-						</>
-					) : (
-						<>
-							<FaPen />
-							<span>Edit mode</span>
-						</>
-					)}
-				</button>
 				<button
 					type='button'
 					onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}

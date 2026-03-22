@@ -14,8 +14,8 @@ interface SheetStore {
 	loadCells: (cells: CellData[]) => void;
 	runningCellId: string | null;
 	setRunningCellId: (id: string | null) => void;
-	isEditable: boolean;
-	setIsEditable: (isEditable: boolean) => void;
+	editableCellId: string | null;
+	setEditalbeCellId: (id: string | null) => void;
 }
 
 export const useSheetStore = create<SheetStore>()(
@@ -31,6 +31,7 @@ export const useSheetStore = create<SheetStore>()(
 						cellData,
 						...prev.cells.slice(index),
 					],
+					editableCellId: cellData.id,
 				})),
 			updateCell: (id, cellData) =>
 				set((prev) => ({
@@ -49,11 +50,11 @@ export const useSheetStore = create<SheetStore>()(
 					[cells[idx], cells[swap]] = [cells[swap], cells[idx]];
 					return { cells };
 				}),
-			loadCells: (cells) => set({ cells, isEditable: false }),
+			loadCells: (cells) => set({ cells, editableCellId: null }),
 			runningCellId: null,
 			setRunningCellId: (id) => set({ runningCellId: id }),
-			isEditable: false,
-			setIsEditable: (isEditable) => set({ isEditable }),
+			editableCellId: null,
+			setEditalbeCellId: (id) => set({ editableCellId: id }),
 		}),
 		{
 			name: 'sheet',

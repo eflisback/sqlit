@@ -41,15 +41,9 @@ const cellMeta: Record<
 
 interface ExecutableCellProps {
 	cellData: ExecutableCellData;
-	isFirst: boolean;
-	isLast: boolean;
 }
 
-export const ExecutableCell = ({
-	cellData,
-	isFirst,
-	isLast,
-}: ExecutableCellProps) => {
+export const ExecutableCell = ({ cellData }: ExecutableCellProps) => {
 	const { Icon, label, information } = cellMeta[cellData.type];
 	const { isLoading, anyRunning, status, run, runWithPrior, showRunWithPrior } =
 		useRunCell(cellData);
@@ -69,8 +63,6 @@ export const ExecutableCell = ({
 				label={label}
 				information={information}
 				cellId={cellData.id}
-				isFirst={isFirst}
-				isLast={isLast}
 				isLoading={isLoading}
 				status={status}
 			>

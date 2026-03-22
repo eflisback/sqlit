@@ -4,24 +4,24 @@ import { CellOutput } from './CellOutput';
 import styles from './cells.module.css';
 
 export const LoadCell = ({ cellData }: { cellData: LoadCellData }) => {
-	const isEditable = useSheetStore((state) => state.isEditable);
+	const editableCellId = useSheetStore((state) => state.editableCellId);
 	const updateCell = useSheetStore((state) => state.updateCell);
+
+	const isEditable = editableCellId === cellData.id;
 
 	return (
 		<>
-			{isEditable ? (
-				<input
-					className={styles.urlInput}
-					type='text'
-					value={cellData.url}
-					placeholder='https://example.com/database.sqlite'
-					onChange={(e) =>
-						updateCell(cellData.id, { ...cellData, url: e.target.value })
-					}
-				/>
-			) : (
-				<span className={styles.urlInput}>{cellData.url || 'No URL'}</span>
-			)}
+			<input
+				className={styles.urlInput}
+				type='text'
+				value={cellData.url}
+				placeholder='https://example.com/database.sqlite'
+				disabled={!isEditable}
+				onChange={(e) =>
+					updateCell(cellData.id, { ...cellData, url: e.target.value })
+				}
+			/>
+
 			<CellOutput result={cellData.result} />
 		</>
 	);

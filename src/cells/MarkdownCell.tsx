@@ -8,19 +8,14 @@ import { useTheme } from '@/components';
 import { useSheetStore } from '@/store';
 import type { MarkdownCellData } from '@/store/types';
 import { CellShell } from './CellShell';
-import styles from './cells.module.css';
 import { useDebouncedCallback } from './useDebouncedCallback';
 
-export const MarkdownCell = ({
-	cellData,
-	isFirst,
-	isLast,
-}: {
+interface MarkdownCellProps {
 	cellData: MarkdownCellData;
-	isFirst: boolean;
-	isLast: boolean;
-}) => {
-	const isEditable = useSheetStore((state) => state.isEditable);
+}
+
+export const MarkdownCell = ({ cellData }: MarkdownCellProps) => {
+	const editableCellId = useSheetStore((state) => state.editableCellId);
 	const updateCell = useSheetStore((state) => state.updateCell);
 	const { theme } = useTheme();
 	const handleChange = useDebouncedCallback(
@@ -28,28 +23,26 @@ export const MarkdownCell = ({
 		150,
 	);
 
+	const isEditable = editableCellId === cellData.id;
+
 	return (
 		<CellShell
 			Icon={FaMarkdown}
 			label='info'
 			information='Used for displaying information to the user.'
 			cellId={cellData.id}
-			isFirst={isFirst}
-			isLast={isLast}
 		>
-			<CodeMirror
-				className={isEditable ? undefined : styles.hidden}
-				basicSetup={{ autocompletion: false, lineNumbers: false }}
-				theme={theme}
-				value={cellData.content}
-				extensions={[markdown(), EditorView.lineWrapping]}
-				onChange={handleChange}
-			/>
-			<div
-				className={`${styles.markdownContent}${isEditable ? ` ${styles.hidden}` : ''}`}
-			>
+			{isEditable ? (
+				<CodeMirror
+					basicSetup={{ autocompletion: false, lineNumbers: false }}
+					theme={theme}
+					value={cellData.content}
+					extensions={[markdown(), EditorView.lineWrapping]}
+					onChange={handleChange}
+				/>
+			) : (
 				<Markdown remarkPlugins={[remarkGfm]}>{cellData.content}</Markdown>
-			</div>
+			)}
 		</CellShell>
 	);
 };

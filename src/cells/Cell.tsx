@@ -5,14 +5,10 @@ import { MarkdownCell } from './MarkdownCell';
 
 interface CellProps {
 	cellData: CellData;
-	isFirst: boolean;
-	isLast: boolean;
 }
 
-export const Cell = memo(({ cellData, isFirst, isLast }: CellProps) => {
+export const Cell = memo(({ cellData }: CellProps) => {
 	if (isExecutableCellData(cellData))
-		return (
-			<ExecutableCell cellData={cellData} isFirst={isFirst} isLast={isLast} />
-		);
-	return <MarkdownCell cellData={cellData} isFirst={isFirst} isLast={isLast} />;
+		return <ExecutableCell cellData={cellData} />;
+	return <MarkdownCell cellData={cellData} />;
 });

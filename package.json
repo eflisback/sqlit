@@ -1,7 +1,7 @@
 {
 	"name": "sqlit",
 	"private": true,
-	"version": "2.0.1",
+	"version": "2.1.0",
 	"type": "module",
 	"scripts": {
 		"setup:pyodide": "node scripts/fetch-pyodide.mjs",
@@ -24,6 +24,7 @@
 		"react-dom": "^19.2.4",
 		"react-icons": "^5.6.0",
 		"react-markdown": "^10.1.0",
+		"react-use": "^17.6.0",
 		"remark-gfm": "^4.0.1",
 		"zod": "^4.3.6",
 		"zustand": "^5.0.11"
