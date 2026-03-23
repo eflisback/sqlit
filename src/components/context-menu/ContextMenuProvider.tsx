@@ -17,14 +17,18 @@ import {
 	FaArrowTurnDown,
 	FaArrowTurnUp,
 	FaArrowUp,
+	FaCopy,
 	FaDatabase,
 	FaFileArrowDown,
+	FaFileCsv,
 	FaMarkdown,
 	FaPython,
 	FaXmark,
 } from 'react-icons/fa6';
 import { useKey } from 'react-use';
 import { type CellData, useSheetStore } from '@/store';
+import { isExecutableCellData } from '@/store/types';
+import { tableToCsv, tableToMarkdown } from '@/utils/result-formatters';
 import styles from './ContextMenu.module.css';
 
 interface ContextMenuState {
@@ -43,8 +47,20 @@ export const ContextMenuContext = createContext<ContextMenuContextValue | null>(
 );
 
 type MenuItem =
-	| { type: 'action'; icon?: IconType; label: string; onSelect: () => void }
-	| { type: 'submenu'; icon?: IconType; label: string; children: MenuItem[] };
+	| {
+			type: 'action';
+			icon?: IconType;
+			label: string;
+			disabled?: boolean;
+			onSelect: () => void;
+	  }
+	| {
+			type: 'submenu';
+			icon?: IconType;
+			label: string;
+			disabled?: boolean;
+			children: MenuItem[];
+	  };
 
 const Menu = ({
 	items,
@@ -62,14 +78,18 @@ const Menu = ({
 			{items.map((item, i) => (
 				<li
 					key={item.label}
-					className={`${styles.item} ${item.type === 'submenu' ? styles.hasSubmenu : ''}`}
+					className={`${styles.item} ${item.type === 'submenu' ? styles.hasSubmenu : ''} ${item.disabled ? styles.disabled : ''}`}
 					onMouseEnter={() =>
-						item.type === 'submenu' ? setActiveIndex(i) : setActiveIndex(null)
+						item.type === 'submenu' && !item.disabled
+							? setActiveIndex(i)
+							: setActiveIndex(null)
 					}
 					onMouseLeave={() =>
 						item.type === 'submenu' ? setActiveIndex(null) : undefined
 					}
-					onMouseDown={item.type === 'action' ? item.onSelect : undefined}
+					onMouseDown={
+						item.type === 'action' && !item.disabled ? item.onSelect : undefined
+					}
 				>
 					{item.icon && <item.icon />}
 					<span>{item.label}</span>
@@ -97,6 +117,60 @@ const CellContextMenu = ({
 	const removeCell = useSheetStore((state) => state.removeCell);
 	const menuRef = useRef<HTMLUListElement>(null);
 
+	const cellIndex = cells.findIndex((c) => c.id === cellId);
+	const cell = cells[cellIndex];
+	const result =
+		cell != null && isExecutableCellData(cell) ? cell.result : null;
+
+	const copyItems: MenuItem[] = [];
+	if (result?.kind === 'table') {
+		copyItems.push({
+			type: 'submenu',
+			icon: FaCopy,
+			label: 'Copy Result',
+			children: [
+				{
+					type: 'action',
+					icon: FaMarkdown,
+					label: 'As Markdown',
+					onSelect: () => {
+						navigator.clipboard.writeText(tableToMarkdown(result));
+						onClose();
+					},
+				},
+				{
+					type: 'action',
+					icon: FaFileCsv,
+					label: 'As CSV',
+					onSelect: () => {
+						navigator.clipboard.writeText(tableToCsv(result));
+						onClose();
+					},
+				},
+			],
+		});
+	} else if (result?.kind === 'text') {
+		copyItems.push({
+			type: 'action',
+			icon: FaCopy,
+			label: 'Copy Output',
+			onSelect: () => {
+				navigator.clipboard.writeText(result.text);
+				onClose();
+			},
+		});
+	} else if (result?.kind === 'error') {
+		copyItems.push({
+			type: 'action',
+			icon: FaCopy,
+			label: 'Copy Error',
+			onSelect: () => {
+				navigator.clipboard.writeText(result.message);
+				onClose();
+			},
+		});
+	}
+
 	useEffect(() => {
 		const handler = (e: MouseEvent) => {
 			if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
@@ -110,10 +184,9 @@ const CellContextMenu = ({
 	useKey('Escape', onClose);
 
 	const handleInsertClick = (type: CellData['type']) => {
-		const idx = cells.findIndex((c) => c.id === cellId);
 		insertCell(
 			{ id: crypto.randomUUID(), type, content: '', result: null } as CellData,
-			idx + 1,
+			cellIndex + 1,
 		);
 		onClose();
 	};
@@ -156,16 +229,19 @@ const CellContextMenu = ({
 	];
 
 	const items: MenuItem[] = [
+		...copyItems,
 		{
 			type: 'action',
 			label: 'Move cell upwards',
 			icon: FaArrowUp,
+			disabled: cellIndex === 0,
 			onSelect: () => handleMoveCellClick('up'),
 		},
 		{
 			type: 'action',
 			label: 'Move cell downwards',
 			icon: FaArrowDown,
+			disabled: cellIndex === cells.length - 1,
 			onSelect: () => handleMoveCellClick('down'),
 		},
 		{

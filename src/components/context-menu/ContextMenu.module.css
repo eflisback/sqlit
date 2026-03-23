@@ -5,7 +5,6 @@
 	padding: unset;
 	background: var(--bg-page);
 	border: 1px solid var(--border);
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 	font-size: 0.875rem;
 	border-radius: 4px;
 }
@@ -18,6 +17,7 @@
 	padding: 4px 10px;
 	cursor: pointer;
 	user-select: none;
+	white-space: nowrap;
 }
 
 .item:hover {
@@ -33,4 +33,9 @@
 	position: absolute;
 	top: -1px;
 	left: 100%;
+}
+
+.disabled {
+	color: var(--text-secondary);
+	cursor: default;
 }
