@@ -22,7 +22,7 @@ import sqlite3
 
 name = input("Enter a name: ")
 
-con = sqlite3.connect(SQLIT_MEMORY)
+con = sqlite3.connect(SQLIT_MEMORY) # Provided by sqlit
 rows = con.execute(
     "SELECT name, email FROM users WHERE name LIKE ?",
     (f"%{name}%",)
@@ -30,6 +30,9 @@ rows = con.execute(
 
 for row in rows:
     print(row)
+
+if len(rows) == 0:
+    print("No results found")
 ````
 
 ## Editing
