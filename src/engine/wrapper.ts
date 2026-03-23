@@ -16,12 +16,16 @@ const worker = new Worker(new URL('./worker/index.ts', import.meta.url), {
 
 export const engine: Remote<Engine> = wrap(worker);
 
-const inputSAB = new SharedArrayBuffer(SAB_SIZE);
-const statusView = new Int32Array(inputSAB, STATUS_OFFSET, 2);
-const decoder = new TextDecoder();
+const inputSAB = window.crossOriginIsolated
+	? new SharedArrayBuffer(SAB_SIZE)
+	: null;
 
-// Queue initInputBuffer before any user runPython calls (Comlink preserves order)
-engine.initInputBuffer(inputSAB);
+if (inputSAB) {
+	engine.initInputBuffer(inputSAB);
+}
+
+const statusView = inputSAB ? new Int32Array(inputSAB, STATUS_OFFSET, 2) : null;
+const decoder = new TextDecoder();
 
 type WaitAsyncResult = { value: Promise<'ok' | 'not-equal' | 'timed-out'> };
 const waitAsync = (
@@ -42,6 +46,7 @@ const waitAsync = (
 export function onInputRequest(
 	cb: (stdout: string, prompt: string) => void,
 ): () => void {
+	if (!inputSAB || !statusView) return () => {};
 	let cancelled = false;
 	const loop = async () => {
 		while (!cancelled) {
@@ -66,6 +71,7 @@ export function onInputRequest(
 }
 
 export function submitInput(text: string): void {
+	if (!inputSAB || !statusView) return;
 	const encoder = new TextEncoder();
 	const encoded = encoder.encode(text);
 	new Uint8Array(inputSAB, RESP_OFFSET, 4096).set(encoded.subarray(0, 4096));

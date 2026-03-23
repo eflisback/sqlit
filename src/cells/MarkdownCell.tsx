@@ -8,7 +8,6 @@ import { useTheme } from '@/components';
 import { useSheetStore } from '@/store';
 import type { MarkdownCellData } from '@/store/types';
 import { CellShell } from './CellShell';
-import { proxyUrl } from './proxyUrl';
 import { useDebouncedCallback } from './useDebouncedCallback';
 
 interface MarkdownCellProps {
@@ -42,9 +41,7 @@ export const MarkdownCell = ({ cellData }: MarkdownCellProps) => {
 					onChange={handleChange}
 				/>
 			) : (
-				<Markdown remarkPlugins={[remarkGfm]} urlTransform={proxyUrl}>
-					{cellData.content}
-				</Markdown>
+				<Markdown remarkPlugins={[remarkGfm]}>{cellData.content}</Markdown>
 			)}
 		</CellShell>
 	);
