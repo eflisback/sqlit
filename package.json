@@ -1,11 +1,12 @@
 {
 	"name": "sqlit",
 	"private": true,
-	"version": "2.1.1",
+	"version": "2.2.0",
 	"type": "module",
 	"scripts": {
 		"setup:pyodide": "node scripts/fetch-pyodide.mjs",
 		"dev": "node scripts/fetch-pyodide.mjs && vite",
+		"dev:vercel": "node scripts/fetch-pyodide.mjs && vercel dev",
 		"build": "node scripts/fetch-pyodide.mjs && tsc -b && vite build",
 		"lint": "biome lint",
 		"format": "biome format --write",
@@ -35,9 +36,11 @@
 		"@types/react": "^19.2.14",
 		"@types/react-dom": "^19.2.3",
 		"@types/react-syntax-highlighter": "^15.5.13",
+		"@vercel/node": "^5.6.18",
 		"@vitejs/plugin-react": "^6.0.0",
 		"globals": "^17.4.0",
 		"typescript": "~5.9.3",
+		"vercel": "^50.35.0",
 		"vite": "^8.0.0"
 	}
 }

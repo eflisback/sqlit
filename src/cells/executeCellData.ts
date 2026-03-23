@@ -1,5 +1,6 @@
 import { engine } from '@/engine';
 import type { CellResult, ExecutableCellData } from '@/store/types';
+import { proxyUrl } from './proxyUrl';
 
 export async function executeCellData(
 	cellData: ExecutableCellData,
@@ -10,7 +11,7 @@ export async function executeCellData(
 		case 'python':
 			return engine.runPython(cellData.content);
 		case 'load':
-			await engine.loadFromUrl(cellData.url);
+			await engine.loadFromUrl(proxyUrl(cellData.url));
 			return { kind: 'text', text: 'Database loaded successfully.' };
 	}
 }
