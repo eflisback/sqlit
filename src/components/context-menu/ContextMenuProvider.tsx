@@ -127,7 +127,7 @@ const CellContextMenu = ({
 		copyItems.push({
 			type: 'submenu',
 			icon: FaCopy,
-			label: 'Copy Result',
+			label: 'Copy result',
 			children: [
 				{
 					type: 'action',
@@ -153,7 +153,7 @@ const CellContextMenu = ({
 		copyItems.push({
 			type: 'action',
 			icon: FaCopy,
-			label: 'Copy Output',
+			label: 'Copy output',
 			onSelect: () => {
 				navigator.clipboard.writeText(result.text);
 				onClose();
@@ -163,7 +163,7 @@ const CellContextMenu = ({
 		copyItems.push({
 			type: 'action',
 			icon: FaCopy,
-			label: 'Copy Error',
+			label: 'Copy error',
 			onSelect: () => {
 				navigator.clipboard.writeText(result.message);
 				onClose();
