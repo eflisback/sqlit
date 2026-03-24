@@ -12,7 +12,7 @@ export const SqlCell = ({ cellData }: { cellData: SqlCellData }) => {
 	const { theme } = useTheme();
 	const handleChange = useDebouncedCallback(
 		(code: string) => updateCell(cellData.id, { ...cellData, content: code }),
-		150,
+		250,
 	);
 
 	return (

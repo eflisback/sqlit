@@ -26,7 +26,15 @@ import {
 	FaXmark,
 } from 'react-icons/fa6';
 import { useKey } from 'react-use';
-import { type CellData, useSheetStore } from '@/store';
+import {
+	type CellData,
+	history,
+	InsertCellCommand,
+	MoveCellCommand,
+	RemoveCellCommand,
+	useSheetStore,
+} from '@/store';
+
 import { isExecutableCellData } from '@/store/types';
 import { tableToCsv, tableToMarkdown } from '@/utils/result-formatters';
 import styles from './ContextMenu.module.css';
@@ -112,9 +120,6 @@ const CellContextMenu = ({
 	onClose,
 }: ContextMenuState & { onClose: () => void }) => {
 	const cells = useSheetStore((state) => state.cells);
-	const insertCell = useSheetStore((state) => state.insertCell);
-	const moveCell = useSheetStore((state) => state.moveCell);
-	const removeCell = useSheetStore((state) => state.removeCell);
 	const menuRef = useRef<HTMLUListElement>(null);
 
 	const cellIndex = cells.findIndex((c) => c.id === cellId);
@@ -184,20 +189,27 @@ const CellContextMenu = ({
 	useKey('Escape', onClose);
 
 	const handleInsertClick = (type: CellData['type']) => {
-		insertCell(
-			{ id: crypto.randomUUID(), type, content: '', result: null } as CellData,
-			cellIndex + 1,
+		history.execute(
+			new InsertCellCommand(
+				{
+					id: crypto.randomUUID(),
+					type,
+					content: '',
+					result: null,
+				} as CellData,
+				cellIndex + 1,
+			),
 		);
 		onClose();
 	};
 
 	const handleMoveCellClick = (direction: 'up' | 'down') => {
-		moveCell(cellId, direction);
+		history.execute(new MoveCellCommand(cellId, direction));
 		onClose();
 	};
 
 	const handleDeleteCellClick = () => {
-		removeCell(cellId);
+		history.execute(new RemoveCellCommand(cellId));
 		onClose();
 	};
 

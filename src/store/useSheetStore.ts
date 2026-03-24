@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { history } from './history';
 import { importSheetMd } from './sheetFile';
 import type { CellData } from './types';
 import { isExecutableCellData } from './types';
@@ -50,7 +51,10 @@ export const useSheetStore = create<SheetStore>()(
 					[cells[idx], cells[swap]] = [cells[swap], cells[idx]];
 					return { cells };
 				}),
-			loadCells: (cells) => set({ cells, editableCellId: null }),
+			loadCells: (cells) => {
+				history.clear();
+				set({ cells, editableCellId: null });
+			},
 			runningCellId: null,
 			setRunningCellId: (id) => set({ runningCellId: id }),
 			editableCellId: null,

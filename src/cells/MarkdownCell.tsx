@@ -20,7 +20,7 @@ export const MarkdownCell = ({ cellData }: MarkdownCellProps) => {
 	const { theme } = useTheme();
 	const handleChange = useDebouncedCallback(
 		(code: string) => updateCell(cellData.id, { ...cellData, content: code }),
-		150,
+		250,
 	);
 
 	const isEditable = editableCellId === cellData.id;

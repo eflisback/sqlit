@@ -21,7 +21,7 @@ export const PythonCell = ({ cellData }: { cellData: PythonCellData }) => {
 	);
 	const handleChange = useDebouncedCallback(
 		(code: string) => updateCell(cellData.id, { ...cellData, content: code }),
-		150,
+		250,
 	);
 
 	const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
