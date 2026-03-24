@@ -7,7 +7,7 @@ import {
 	FaSun,
 } from 'react-icons/fa6';
 import { useTheme } from '@/components';
-import { exportSheetMd, importSheetMd, useSheetStore } from '@/store';
+import { readSheetFileMd, saveSheetMd, useSheetStore } from '@/store';
 import { version } from '../../../package.json';
 import styles from './Sheet.module.css';
 
@@ -18,29 +18,18 @@ export const Header = () => {
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const handleExport = () => {
-		const md = exportSheetMd(cells);
-		const blob = new Blob([md], { type: 'text/markdown' });
-		const url = URL.createObjectURL(blob);
-		const a = document.createElement('a');
-		a.href = url;
-		a.download = 'sheet.sqlit.md';
-		a.click();
-		URL.revokeObjectURL(url);
+		saveSheetMd(cells);
 	};
 
-	const handleImport = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
 		if (!file) return;
-		const reader = new FileReader();
-		reader.onload = () => {
-			try {
-				const imported = importSheetMd(reader.result as string);
-				loadCells(imported);
-			} catch {
-				alert('Failed to import sheet: invalid or malformed file.');
-			}
-		};
-		reader.readAsText(file);
+		try {
+			const imported = await readSheetFileMd(file);
+			loadCells(imported);
+		} catch (err) {
+			alert(`Failed to import sheet: ${(err as Error).message}`);
+		}
 		e.target.value = '';
 	};
 

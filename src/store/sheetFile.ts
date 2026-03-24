@@ -25,6 +25,59 @@ export function exportSheetMd(cells: CellData[]): string {
 	return parts.join('\n\n');
 }
 
+export async function saveSheetMd(cells: CellData[]): Promise<void> {
+	const md = exportSheetMd(cells);
+	const blob = new Blob([md], { type: 'text/markdown' });
+
+	if ('showSaveFilePicker' in window) {
+		try {
+			const handle = await (
+				window as Window & {
+					showSaveFilePicker: (
+						options: unknown,
+					) => Promise<FileSystemFileHandle>;
+				}
+			).showSaveFilePicker({
+				suggestedName: 'sheet.sqlit.md',
+				types: [
+					{
+						description: 'Sqlit Markdown',
+						accept: { 'text/markdown': ['.sqlit.md', '.md'] },
+					},
+				],
+			});
+			const writable = await handle.createWritable();
+			await writable.write(blob);
+			await writable.close();
+			return;
+		} catch (e) {
+			if ((e as DOMException).name === 'AbortError') return;
+		}
+	}
+
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = 'sheet.sqlit.md';
+	a.click();
+	URL.revokeObjectURL(url);
+}
+
+export function readSheetFileMd(file: File): Promise<CellData[]> {
+	return new Promise((resolve, reject) => {
+		const reader = new FileReader();
+		reader.onload = () => {
+			try {
+				resolve(importSheetMd(reader.result as string));
+			} catch {
+				reject(new Error('Invalid or malformed file.'));
+			}
+		};
+		reader.onerror = () => reject(new Error('Failed to read file.'));
+		reader.readAsText(file);
+	});
+}
+
 export function importSheetMd(markdown: string): CellData[] {
 	const lines = markdown.split('\n');
 	const cells: CellData[] = [];
