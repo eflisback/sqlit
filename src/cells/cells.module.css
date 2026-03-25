@@ -80,6 +80,10 @@
 	font-size: 0.7em;
 }
 
+.actions button:disabled {
+	cursor: default;
+}
+
 .actions button:hover:not(:disabled) {
 	color: var(--text-primary);
 }

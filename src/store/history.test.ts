@@ -2,12 +2,21 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { history } from './history';
 
 const makeMockCmd = () => {
-	let executeCalls = 0, undoCalls = 0;
+	let executeCalls = 0,
+		undoCalls = 0;
 	return {
-		execute() { executeCalls++; },
-		undo()    { undoCalls++; },
-		get executeCalls() { return executeCalls; },
-		get undoCalls()    { return undoCalls; },
+		execute() {
+			executeCalls++;
+		},
+		undo() {
+			undoCalls++;
+		},
+		get executeCalls() {
+			return executeCalls;
+		},
+		get undoCalls() {
+			return undoCalls;
+		},
 	};
 };
 
