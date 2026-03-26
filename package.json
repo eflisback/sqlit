@@ -1,7 +1,7 @@
 {
 	"name": "sqlit",
 	"private": true,
-	"version": "2.4.2",
+	"version": "2.4.3",
 	"type": "module",
 	"scripts": {
 		"setup:pyodide": "node scripts/fetch-pyodide.mjs",

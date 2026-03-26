@@ -7,6 +7,7 @@ import {
 	FaSun,
 } from 'react-icons/fa6';
 import { useTheme } from '@/components';
+import { engine } from '@/engine';
 import { readSheetFileMd, saveSheetMd, useSheetStore } from '@/store';
 import { version } from '../../../package.json';
 import styles from './Sheet.module.css';
@@ -26,6 +27,7 @@ export const Header = () => {
 		if (!file) return;
 		try {
 			const imported = await readSheetFileMd(file);
+			engine.reset();
 			loadCells(imported);
 		} catch (err) {
 			alert(`Failed to import sheet: ${(err as Error).message}`);

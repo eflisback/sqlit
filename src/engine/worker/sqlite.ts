@@ -32,6 +32,13 @@ export const query = async (sql: string): Promise<CellResult> => {
 	return { kind: 'table', rows, columns, rowsAffected };
 };
 
+export const resetDb = (): void => {
+	if (db) {
+		db.close();
+		db = null;
+	}
+};
+
 export const loadFromUrl = async (url: string): Promise<void> => {
 	const s3 = await getSqlite3();
 	const response = await fetch(url);

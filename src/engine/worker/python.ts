@@ -4,6 +4,7 @@ import { isInputReady } from './input';
 import { getDb } from './sqlite';
 
 let py: PyodideAPI | null = null;
+let pyPromise: Promise<PyodideAPI> | null = null;
 
 const INPUT_OVERRIDE_PY = `import builtins, js
 def _input(prompt=''):
@@ -13,17 +14,29 @@ builtins.input = _input`;
 export const getPyInstance = (): PyodideAPI | null => py;
 
 export const getPy = async (): Promise<PyodideAPI> => {
-	if (!py) {
-		py = await loadPyodide({ indexURL: '/pyodide/' });
-		await py.loadPackage('micropip');
-		await py.runPythonAsync(
-			'import micropip; await micropip.install("sqlite3")',
-		);
+	if (py) return py;
+	if (!pyPromise) {
+		pyPromise = (async () => {
+			const instance = await loadPyodide({ indexURL: '/pyodide/' });
+			await instance.loadPackage('micropip');
+			await instance.runPythonAsync(
+				'import micropip; await micropip.install("sqlite3")',
+			);
+			py = instance;
+			pyPromise = null;
+			return instance;
+		})();
 	}
-	return py;
+	return pyPromise;
 };
 
 getPy();
+
+export const resetPython = (): void => {
+	py = null;
+	pyPromise = null;
+	getPy();
+};
 
 export const runPython = async (code: string): Promise<CellResult> => {
 	const [currentDb, s3] = await getDb();

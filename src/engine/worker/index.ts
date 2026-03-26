@@ -1,10 +1,15 @@
 import { expose } from 'comlink';
 import { initInputBuffer, setPyGetter } from './input';
-import { getPyInstance, runPython } from './python';
-import { loadFromUrl, query } from './sqlite';
+import { getPyInstance, resetPython, runPython } from './python';
+import { loadFromUrl, query, resetDb } from './sqlite';
 
 setPyGetter(getPyInstance);
 
-export const engine = { initInputBuffer, query, loadFromUrl, runPython };
+const reset = (): void => {
+	resetDb();
+	resetPython();
+};
+
+export const engine = { initInputBuffer, query, loadFromUrl, runPython, reset };
 export type Engine = typeof engine;
 expose(engine);
