@@ -24,6 +24,7 @@ export const MarkdownCell = ({ cellData }: MarkdownCellProps) => {
 	);
 
 	const isEditable = editableCellId === cellData.id;
+	const isEmpty = !cellData.content.trim();
 
 	return (
 		<CellShell
@@ -31,6 +32,7 @@ export const MarkdownCell = ({ cellData }: MarkdownCellProps) => {
 			label='info'
 			information='Used for displaying information to the user.'
 			cellId={cellData.id}
+			hideHeader={!isEmpty || isEditable}
 		>
 			{isEditable ? (
 				<CodeMirror

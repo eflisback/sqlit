@@ -8,6 +8,14 @@
 	border-left: 5px solid var(--border);
 }
 
+.cell:first-of-type {
+	padding-top: 45px;
+}
+
+.cell:last-of-type {
+	padding-bottom: 45px;
+}
+
 .success {
 	border-color: var(--color-success);
 }

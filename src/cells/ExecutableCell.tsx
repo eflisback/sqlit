@@ -54,7 +54,7 @@ export const ExecutableCell = ({ cellData }: ExecutableCellProps) => {
 		: isEmpty
 			? 'Cell is empty'
 			: undefined;
-	const ref = useRef<HTMLDivElement>(null);
+	const ref = useRef<HTMLElement>(null);
 	const runningCellId = useSheetStore((state) => state.runningCellId);
 
 	useEffect(() => {
@@ -64,43 +64,42 @@ export const ExecutableCell = ({ cellData }: ExecutableCellProps) => {
 	}, [runningCellId, cellData.id]);
 
 	return (
-		<div ref={ref}>
-			<CellShell
-				Icon={Icon}
-				label={label}
-				information={information}
-				cellId={cellData.id}
-				isLoading={isLoading}
-				status={status}
-			>
-				{cellData.type === 'sql' && <SqlCell cellData={cellData} />}
-				{cellData.type === 'python' && <PythonCell cellData={cellData} />}
-				{cellData.type === 'load' && <LoadCell cellData={cellData} />}
-				<section className={styles.actions}>
+		<CellShell
+			ref={ref}
+			Icon={Icon}
+			label={label}
+			information={information}
+			cellId={cellData.id}
+			isLoading={isLoading}
+			status={status}
+		>
+			{cellData.type === 'sql' && <SqlCell cellData={cellData} />}
+			{cellData.type === 'python' && <PythonCell cellData={cellData} />}
+			{cellData.type === 'load' && <LoadCell cellData={cellData} />}
+			<section className={styles.actions}>
+				<button
+					type='button'
+					onClick={run}
+					disabled={anyRunning || isEmpty}
+					title={disabledReason}
+				>
+					<FaPlay />
+					<span className={isLoading ? styles.shimmer : undefined}>
+						{isLoading ? 'Running...' : 'Run cell'}
+					</span>
+				</button>
+				{showRunWithPrior && (
 					<button
 						type='button'
-						onClick={run}
+						onClick={runWithPrior}
 						disabled={anyRunning || isEmpty}
 						title={disabledReason}
 					>
-						<FaPlay />
-						<span className={isLoading ? styles.shimmer : undefined}>
-							{isLoading ? 'Running...' : 'Run cell'}
-						</span>
+						<FaForward />
+						<span>Run to here</span>
 					</button>
-					{showRunWithPrior && (
-						<button
-							type='button'
-							onClick={runWithPrior}
-							disabled={anyRunning || isEmpty}
-							title={disabledReason}
-						>
-							<FaForward />
-							<span>Run to here</span>
-						</button>
-					)}
-				</section>
-			</CellShell>
-		</div>
+				)}
+			</section>
+		</CellShell>
 	);
 };
