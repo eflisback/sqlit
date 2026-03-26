@@ -49,6 +49,11 @@ export const ExecutableCell = ({ cellData }: ExecutableCellProps) => {
 		useRunCell(cellData);
 	const isEmpty =
 		cellData.type === 'load' ? !cellData.url.trim() : !cellData.content.trim();
+	const disabledReason = anyRunning
+		? 'Another cell is running'
+		: isEmpty
+			? 'Cell is empty'
+			: undefined;
 	const ref = useRef<HTMLDivElement>(null);
 	const runningCellId = useSheetStore((state) => state.runningCellId);
 
@@ -72,7 +77,12 @@ export const ExecutableCell = ({ cellData }: ExecutableCellProps) => {
 				{cellData.type === 'python' && <PythonCell cellData={cellData} />}
 				{cellData.type === 'load' && <LoadCell cellData={cellData} />}
 				<section className={styles.actions}>
-					<button type='button' onClick={run} disabled={anyRunning || isEmpty}>
+					<button
+						type='button'
+						onClick={run}
+						disabled={anyRunning || isEmpty}
+						title={disabledReason}
+					>
 						<FaPlay />
 						<span className={isLoading ? styles.shimmer : undefined}>
 							{isLoading ? 'Running...' : 'Run cell'}
@@ -83,6 +93,7 @@ export const ExecutableCell = ({ cellData }: ExecutableCellProps) => {
 							type='button'
 							onClick={runWithPrior}
 							disabled={anyRunning || isEmpty}
+							title={disabledReason}
 						>
 							<FaForward />
 							<span>Run to here</span>
