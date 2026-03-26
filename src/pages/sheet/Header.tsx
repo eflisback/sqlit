@@ -39,9 +39,16 @@ export const Header = () => {
 				<img src='/logo.svg' alt='sqlit logo' />
 				<span>sqlit</span>
 			</section>
-			<section className={styles.version}>
-				<FaGitAlt />
-				<span>{version}</span>
+			<section>
+				<a
+					className={styles.version}
+					href='https://github.com/eflisback/sqlit'
+					target='_blank'
+					rel='noopener'
+				>
+					<FaGitAlt />
+					<span>{version}</span>
+				</a>
 			</section>
 			<section className={styles.buttons}>
 				<button type='button' onClick={handleExport} title='Export sheet'>

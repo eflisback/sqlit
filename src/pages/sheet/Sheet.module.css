@@ -46,6 +46,10 @@
 	font-size: 0.7em;
 }
 
+.version:hover {
+	color: var(--text-primary);
+}
+
 .header section:first-of-type {
 	flex: 1;
 	justify-content: start;
