@@ -27,7 +27,6 @@ import {
 } from 'react-icons/fa6';
 import { useKey } from 'react-use';
 import {
-	type CellData,
 	history,
 	InsertCellCommand,
 	MoveCellCommand,
@@ -60,6 +59,7 @@ type MenuItem =
 			icon?: IconType;
 			label: string;
 			disabled?: boolean;
+			title?: string;
 			onSelect: () => void;
 	  }
 	| {
@@ -67,6 +67,7 @@ type MenuItem =
 			icon?: IconType;
 			label: string;
 			disabled?: boolean;
+			title?: string;
 			children: MenuItem[];
 	  };
 
@@ -87,6 +88,7 @@ const Menu = ({
 				<li
 					key={item.label}
 					className={`${styles.item} ${item.type === 'submenu' ? styles.hasSubmenu : ''} ${item.disabled ? styles.disabled : ''}`}
+					title={item.title}
 					onMouseEnter={() =>
 						item.type === 'submenu' && !item.disabled
 							? setActiveIndex(i)
@@ -188,21 +190,6 @@ const CellContextMenu = ({
 
 	useKey('Escape', onClose);
 
-	const handleInsertClick = (type: CellData['type']) => {
-		history.execute(
-			new InsertCellCommand(
-				{
-					id: crypto.randomUUID(),
-					type,
-					content: '',
-					result: null,
-				} as CellData,
-				cellIndex + 1,
-			),
-		);
-		onClose();
-	};
-
 	const handleMoveCellClick = (direction: 'up' | 'down') => {
 		history.execute(new MoveCellCommand(cellId, direction));
 		onClose();
@@ -213,32 +200,90 @@ const CellContextMenu = ({
 		onClose();
 	};
 
-	const insertCellItems: MenuItem[] = [
+	const makeInsertItems = (
+		insertIndex: number,
+		markdownDisabled: boolean,
+	): MenuItem[] => [
 		{
 			type: 'action',
 			icon: FaMarkdown,
 			label: 'Markdown',
-			onSelect: () => handleInsertClick('markdown'),
+			disabled: markdownDisabled,
+			title: markdownDisabled
+				? 'Adjacent to a Markdown cell (edit the existing one instead)'
+				: undefined,
+			onSelect: () => {
+				history.execute(
+					new InsertCellCommand(
+						{ id: crypto.randomUUID(), type: 'markdown', content: '' },
+						insertIndex,
+					),
+				);
+				onClose();
+			},
 		},
 		{
 			type: 'action',
 			icon: FaDatabase,
 			label: 'SQL',
-			onSelect: () => handleInsertClick('sql'),
+			onSelect: () => {
+				history.execute(
+					new InsertCellCommand(
+						{ id: crypto.randomUUID(), type: 'sql', content: '', result: null },
+						insertIndex,
+					),
+				);
+				onClose();
+			},
 		},
 		{
 			type: 'action',
 			icon: FaPython,
 			label: 'Python',
-			onSelect: () => handleInsertClick('python'),
+			onSelect: () => {
+				history.execute(
+					new InsertCellCommand(
+						{
+							id: crypto.randomUUID(),
+							type: 'python',
+							content: '',
+							result: null,
+						},
+						insertIndex,
+					),
+				);
+				onClose();
+			},
 		},
 		{
 			type: 'action',
 			icon: FaFileArrowDown,
 			label: 'Load',
-			onSelect: () => handleInsertClick('load'),
+			onSelect: () => {
+				history.execute(
+					new InsertCellCommand(
+						{ id: crypto.randomUUID(), type: 'load', url: '', result: null },
+						insertIndex,
+					),
+				);
+				onClose();
+			},
 		},
 	];
+
+	// Insert above: new cell at cellIndex; neighbors are cells[cellIndex-1] and cells[cellIndex]
+	const aboveMarkdownDisabled =
+		cells[cellIndex - 1]?.type === 'markdown' || cell?.type === 'markdown';
+
+	// Insert below: new cell at cellIndex+1; neighbors are cells[cellIndex] and cells[cellIndex+1]
+	const belowMarkdownDisabled =
+		cell?.type === 'markdown' || cells[cellIndex + 1]?.type === 'markdown';
+
+	const insertAboveItems = makeInsertItems(cellIndex, aboveMarkdownDisabled);
+	const insertBelowItems = makeInsertItems(
+		cellIndex + 1,
+		belowMarkdownDisabled,
+	);
 
 	const items: MenuItem[] = [
 		...copyItems,
@@ -247,6 +292,7 @@ const CellContextMenu = ({
 			label: 'Move cell upwards',
 			icon: FaArrowUp,
 			disabled: cellIndex === 0,
+			title: cellIndex === 0 ? 'Cell is already at the top' : undefined,
 			onSelect: () => handleMoveCellClick('up'),
 		},
 		{
@@ -254,19 +300,23 @@ const CellContextMenu = ({
 			label: 'Move cell downwards',
 			icon: FaArrowDown,
 			disabled: cellIndex === cells.length - 1,
+			title:
+				cellIndex === cells.length - 1
+					? 'Cell is already at the bottom'
+					: undefined,
 			onSelect: () => handleMoveCellClick('down'),
 		},
 		{
 			type: 'submenu',
 			label: 'Insert cell above',
 			icon: FaArrowTurnUp,
-			children: insertCellItems,
+			children: insertAboveItems,
 		},
 		{
 			type: 'submenu',
 			label: 'Insert cell below',
 			icon: FaArrowTurnDown,
-			children: insertCellItems,
+			children: insertBelowItems,
 		},
 		{
 			type: 'action',
