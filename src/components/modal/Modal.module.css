@@ -1,0 +1,52 @@
+.backdrop {
+	position: fixed;
+	inset: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 105;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.modal {
+	background-color: var(--bg-cell);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	padding: 30px;
+	min-width: 320px;
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.modal-title {
+	font-size: 1.6rem;
+	font-weight: bold;
+}
+
+.modal header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.login-button {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 10px;
+	justify-content: center;
+	border: 1px solid var(--border);
+	padding: 10px;
+	border-radius: 8px;
+	transition:
+		color 0.05s ease,
+		background 0.05s ease,
+		border 0.05s ease;
+}
+
+.login-button:hover {
+	background-color: var(--color-highlight);
+	border-color: var(--color-highlight);
+	color: var(--bg-cell);
+}

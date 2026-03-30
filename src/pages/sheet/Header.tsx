@@ -4,15 +4,17 @@ import {
 	FaFileImport,
 	FaGitAlt,
 	FaMoon,
+	FaShare,
 	FaSun,
 } from 'react-icons/fa6';
-import { useTheme } from '@/components';
+import { ShareModal, useModal, useTheme } from '@/components';
 import { engine } from '@/engine';
 import { readSheetFileMd, saveSheetMd, useSheetStore } from '@/store';
 import { version } from '../../../package.json';
 import styles from './Sheet.module.css';
 
 export const Header = () => {
+	const { openModal } = useModal();
 	const { theme, setTheme } = useTheme();
 	const cells = useSheetStore((state) => state.cells);
 	const loadCells = useSheetStore((state) => state.loadCells);
@@ -55,11 +57,19 @@ export const Header = () => {
 			<section className={styles.buttons}>
 				<button type='button' onClick={handleExport} title='Export sheet'>
 					<FaFileExport />
-					<span>Export sheet</span>
+					<span>Export</span>
 				</button>
 				<button type='button' onClick={() => fileInputRef.current?.click()}>
 					<FaFileImport />
-					<span>Import sheet</span>
+					<span>Import</span>
+				</button>
+				<button
+					type='button'
+					onClick={() => openModal('Share via Gists', <ShareModal />)}
+					title='Share sheet'
+				>
+					<FaShare />
+					<span>Share</span>
 				</button>
 				<input
 					ref={fileInputRef}
