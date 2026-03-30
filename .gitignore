@@ -25,4 +25,5 @@ sheets/
 *.sln
 *.sw?
 .vercel
-.env*.local
+.env*
+!.env.example

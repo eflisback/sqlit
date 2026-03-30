@@ -50,3 +50,91 @@
 	border-color: var(--color-highlight);
 	color: var(--bg-cell);
 }
+
+.text-button {
+	background: none;
+	border: none;
+	color: var(--color-highlight);
+	cursor: pointer;
+	padding: 0;
+	font-size: 0.875rem;
+	text-align: left;
+}
+
+.text-button:hover {
+	text-decoration: underline;
+}
+
+.error-text {
+	color: var(--color-error, #e53e3e);
+	font-size: 0.875rem;
+}
+
+.success-heading {
+	font-size: 1.2rem;
+	font-weight: bold;
+}
+
+.url-row {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.url-input {
+	flex: 1;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	padding: 8px;
+	background: var(--bg-cell);
+	color: inherit;
+	font-size: 0.875rem;
+	min-width: 0;
+}
+
+.spinner-text {
+	color: var(--color-muted, #888);
+}
+
+.gist-list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	max-height: 240px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.gist-item {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+	padding: 8px 10px;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	background: none;
+	cursor: pointer;
+	text-align: left;
+	transition: background 0.05s ease;
+}
+
+.gist-item:hover {
+	background-color: var(--bg-hover, rgba(0, 0, 0, 0.05));
+}
+
+.gist-description {
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.gist-date {
+	font-size: 0.8rem;
+	color: var(--color-muted, #888);
+	white-space: nowrap;
+}
