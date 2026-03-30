@@ -17,6 +17,8 @@ interface SheetStore {
 	setRunningCellId: (id: string | null) => void;
 	editableCellId: string | null;
 	setEditalbeCellId: (id: string | null) => void;
+	sharedGistId: string | null;
+	setSharedGistId: (id: string | null) => void;
 }
 
 export const useSheetStore = create<SheetStore>()(
@@ -53,12 +55,14 @@ export const useSheetStore = create<SheetStore>()(
 				}),
 			loadCells: (cells) => {
 				history.clear();
-				set({ cells, editableCellId: null });
+				set({ cells, editableCellId: null, sharedGistId: null });
 			},
 			runningCellId: null,
 			setRunningCellId: (id) => set({ runningCellId: id }),
 			editableCellId: null,
 			setEditalbeCellId: (id) => set({ editableCellId: id }),
+			sharedGistId: null,
+			setSharedGistId: (id) => set({ sharedGistId: id }),
 		}),
 		{
 			name: 'sheet',
@@ -73,6 +77,7 @@ export const useSheetStore = create<SheetStore>()(
 					(cell): CellData =>
 						isExecutableCellData(cell) ? { ...cell, result: null } : cell,
 				),
+				sharedGistId: state.sharedGistId,
 			}),
 		},
 	),

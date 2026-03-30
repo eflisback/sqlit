@@ -25,11 +25,12 @@ async function githubFetch(
 export async function createGist(
 	accessToken: string,
 	content: string,
+	name: string,
 ): Promise<{ id: string; url: string }> {
 	const data = (await githubFetch(accessToken, '/gists', {
 		method: 'POST',
 		body: JSON.stringify({
-			description: 'sqlit sheet',
+			description: name,
 			public: false,
 			files: { 'sheet.sqlit.md': { content } },
 		}),

@@ -27,3 +27,4 @@ sheets/
 .vercel
 .env*
 !.env.example
+.env*.local

@@ -65,7 +65,7 @@ export const Header = () => {
 				</button>
 				<button
 					type='button'
-					onClick={() => openModal('Share via Gists', <ShareModal />)}
+					onClick={() => openModal('Share your sheet', <ShareModal />)}
 					title='Share sheet'
 				>
 					<FaShare />
