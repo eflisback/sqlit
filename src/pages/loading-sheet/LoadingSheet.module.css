@@ -1,0 +1,56 @@
+.container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+	gap: 20px;
+}
+
+.logo {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 12px;
+	font-family: "VT323", monospace;
+	font-size: 4rem;
+	line-height: 1;
+}
+
+.logo img {
+	position: relative;
+	top: 5px;
+	height: 0.5em;
+	width: 0.5em;
+}
+
+.logoText {
+	-webkit-font-smoothing: none;
+	-moz-osx-font-smoothing: none;
+	text-rendering: geometricPrecision;
+	background: linear-gradient(
+		90deg,
+		var(--text-primary) 0%,
+		var(--color-highlight) 50%,
+		var(--text-primary) 100%
+	);
+	background-size: 200% 100%;
+	background-clip: text;
+	-webkit-background-clip: text;
+	color: transparent;
+	animation: text-shimmer 1s linear infinite;
+}
+
+.subtitle {
+	color: var(--text-secondary);
+	font-size: 0.875rem;
+}
+
+@keyframes text-shimmer {
+	from {
+		background-position: 100% 0;
+	}
+	to {
+		background-position: -100% 0;
+	}
+}

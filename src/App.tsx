@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { engine } from '@/engine';
 import { fetchGist } from '@/api/github';
+import { engine } from '@/engine';
 import { importSheetMd, useSheetStore } from '@/store';
-import { BrowserNotice, Sheet } from './pages';
+import { BrowserNotice, ErrorSheet, LoadingSheet, Sheet } from './pages';
 
 function App() {
 	const loadCells = useSheetStore((state) => state.loadCells);
@@ -28,6 +28,7 @@ function App() {
 				setGistState('idle');
 			})
 			.catch((err) => {
+				history.replaceState(null, '', '/');
 				setGistError(
 					err instanceof Error ? err.message : 'Failed to load shared sheet',
 				);
@@ -36,21 +37,16 @@ function App() {
 	}, [loadCells]);
 
 	if (gistState === 'loading') {
-		return (
-			<p style={{ textAlign: 'center', marginTop: '2rem' }}>
-				Loading shared sheet…
-			</p>
-		);
+		return <LoadingSheet />;
 	}
 
 	if (gistState === 'error') {
+		const baseError = 'Shared sheet not available.';
 		return (
-			<div style={{ textAlign: 'center', marginTop: '2rem' }}>
-				<p>Failed to load shared sheet: {gistError}</p>
-				<button type='button' onClick={() => setGistState('idle')}>
-					Continue anyway
-				</button>
-			</div>
+			<ErrorSheet
+				error={baseError + gistError ? `(${gistError})` : ''}
+				onContinue={() => setGistState('idle')}
+			/>
 		);
 	}
 

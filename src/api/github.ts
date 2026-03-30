@@ -1,10 +1,10 @@
 const GITHUB_API = 'https://api.github.com';
 
-async function githubFetch(
+const githubFetch = async (
 	accessToken: string,
 	path: string,
 	options: RequestInit = {},
-): Promise<unknown> {
+) => {
 	const res = await fetch(`${GITHUB_API}${path}`, {
 		...options,
 		headers: {
@@ -20,13 +20,13 @@ async function githubFetch(
 		throw new Error(`GitHub API error ${res.status}: ${text}`);
 	}
 	return res.json();
-}
+};
 
-export async function createGist(
+export const createGist = async (
 	accessToken: string,
 	content: string,
 	name: string,
-): Promise<{ id: string; url: string }> {
+) => {
 	const data = (await githubFetch(accessToken, '/gists', {
 		method: 'POST',
 		body: JSON.stringify({
@@ -36,13 +36,13 @@ export async function createGist(
 		}),
 	})) as { id: string; html_url: string };
 	return { id: data.id, url: data.html_url };
-}
+};
 
-export async function updateGist(
+export const updateGist = async (
 	accessToken: string,
 	gistId: string,
 	content: string,
-): Promise<{ id: string; url: string }> {
+) => {
 	const data = (await githubFetch(accessToken, `/gists/${gistId}`, {
 		method: 'PATCH',
 		body: JSON.stringify({
@@ -50,9 +50,9 @@ export async function updateGist(
 		}),
 	})) as { id: string; html_url: string };
 	return { id: data.id, url: data.html_url };
-}
+};
 
-export async function fetchGist(gistId: string): Promise<string> {
+export const fetchGist = async (gistId: string) => {
 	const res = await fetch(`${GITHUB_API}/gists/${gistId}`, {
 		headers: {
 			Accept: 'application/vnd.github+json',
@@ -73,7 +73,7 @@ export async function fetchGist(gistId: string): Promise<string> {
 	const raw = await fetch(file.raw_url);
 	if (!raw.ok) throw new Error(`Failed to fetch gist content: ${raw.status}`);
 	return raw.text();
-}
+};
 
 export interface GistEntry {
 	id: string;
@@ -82,9 +82,9 @@ export interface GistEntry {
 	updatedAt: string;
 }
 
-export async function listSqlitGists(
+export const listSqlitGists = async (
 	accessToken: string,
-): Promise<GistEntry[]> {
+): Promise<GistEntry[]> => {
 	const data = (await githubFetch(
 		accessToken,
 		'/gists?per_page=100',
@@ -105,4 +105,4 @@ export async function listSqlitGists(
 			description: gist.description,
 			updatedAt: gist.updated_at,
 		}));
-}
+};

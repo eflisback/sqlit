@@ -18,7 +18,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 		return;
 	}
 
-	// Clear the state cookie
 	res.setHeader(
 		'Set-Cookie',
 		'oauth_state=; HttpOnly; SameSite=Lax; Path=/api; Max-Age=0',

@@ -1,12 +1,13 @@
 import { useState } from 'react';
+import { FaCopy } from 'react-icons/fa6';
 import styles from '../Modal.module.css';
 
 interface Props {
 	sharedUrl: string;
-	onShareAgain: () => void;
+	wasOverwrite: boolean;
 }
 
-export const DoneView = ({ sharedUrl, onShareAgain }: Props) => {
+export const DoneView = ({ sharedUrl, wasOverwrite }: Props) => {
 	const [copied, setCopied] = useState(false);
 
 	async function handleCopy() {
@@ -17,25 +18,22 @@ export const DoneView = ({ sharedUrl, onShareAgain }: Props) => {
 
 	return (
 		<>
-			<p className={styles.successHeading}>Shared!</p>
-			<div className={styles.urlRow}>
-				<input
-					type='text'
-					readOnly
-					value={sharedUrl}
-					className={styles.urlInput}
-				/>
+			<p>
+				{wasOverwrite
+					? 'Your updated sheet can be accessed using the same link as before:'
+					: 'Your sheet is now live and can be accessed at:'}
+			</p>
+			<div className={styles.inputRow}>
+				<code className={styles.urlCode}>{sharedUrl}</code>
 				<button
 					type='button'
-					className={styles.loginButton}
+					className={styles.wideButton}
 					onClick={handleCopy}
 				>
-					{copied ? 'Copied!' : 'Copy'}
+					<FaCopy />
+					<span>{copied ? 'Copied!' : 'Copy'}</span>
 				</button>
 			</div>
-			<button type='button' className={styles.textButton} onClick={onShareAgain}>
-				Share again
-			</button>
 		</>
 	);
 };

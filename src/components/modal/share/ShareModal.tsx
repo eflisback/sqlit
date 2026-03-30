@@ -1,4 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import {
+	FaFileExport,
+	FaFilePen,
+	FaGithub,
+	FaLink,
+	FaXmark,
+} from 'react-icons/fa6';
 import {
 	createGist,
 	type GistEntry,
@@ -13,11 +20,8 @@ import {
 } from '@/store';
 import styles from '../Modal.module.css';
 import { DoneView } from './DoneView';
-import { GistPickerView } from './GistPickerView';
-import { IdleView } from './IdleView';
-import { LoginView } from './LoginView';
 
-type UiState = 'idle' | 'picking' | 'sharing' | 'done';
+type UiState = 'idle' | 'sharing' | 'done';
 
 export const ShareModal = () => {
 	const accessToken = useAuthStore((state) => state.accessToken);
@@ -30,7 +34,28 @@ export const ShareModal = () => {
 	const [gists, setGists] = useState<GistEntry[]>([]);
 	const [gistsLoading, setGistsLoading] = useState(false);
 	const [sharedUrl, setSharedUrl] = useState('');
+	const [wasOverwrite, setWasOverwrite] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [name, setName] = useState('');
+	const [selectedGistId, setSelectedGistId] = useState(sharedGistId ?? '');
+
+	useEffect(() => {
+		setSelectedGistId(sharedGistId ?? '');
+	}, [sharedGistId]);
+
+	useEffect(() => {
+		if (!accessToken) return;
+		setGistsLoading(true);
+		listSqlitGists(accessToken)
+			.then(setGists)
+			.catch((err) =>
+				setError(err instanceof Error ? err.message : 'Unknown error'),
+			)
+			.finally(() => setGistsLoading(false));
+	}, [accessToken]);
+
+	const isDuplicate =
+		name.trim() !== '' && gists.some((g) => g.description === name.trim());
 
 	const openOAuthPopup = () => {
 		const popup = window.open(
@@ -53,15 +78,16 @@ export const ShareModal = () => {
 		});
 	};
 
-	const handleCreateGist = async (name: string) => {
+	const handleCreateGist = async () => {
 		if (!accessToken) return;
 		setError(null);
 		setUiState('sharing');
 		try {
 			const content = exportSheetMd(cells);
-			const result = await createGist(accessToken, content, name);
+			const result = await createGist(accessToken, content, name.trim());
 			setSharedGistId(result.id);
 			setSharedUrl(`${window.location.origin}?gist=${result.id}`);
+			setWasOverwrite(false);
 			setUiState('done');
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Unknown error');
@@ -69,47 +95,16 @@ export const ShareModal = () => {
 		}
 	};
 
-	const handleOverwritePrevious = async () => {
-		if (!accessToken || !sharedGistId) return;
-		setError(null);
-		setUiState('sharing');
-		try {
-			const content = exportSheetMd(cells);
-			const result = await updateGist(accessToken, sharedGistId, content);
-			setSharedGistId(result.id);
-			setSharedUrl(`${window.location.origin}?gist=${result.id}`);
-			setUiState('done');
-		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Unknown error');
-			setUiState('idle');
-		}
-	};
-
-	const handlePickGist = async () => {
-		if (!accessToken) return;
-		setError(null);
-		setUiState('picking');
-		setGistsLoading(true);
-		try {
-			const list = await listSqlitGists(accessToken);
-			setGists(list);
-		} catch (err) {
-			setError(err instanceof Error ? err.message : 'Unknown error');
-			setUiState('idle');
-		} finally {
-			setGistsLoading(false);
-		}
-	};
-
-	const handleSelectGist = async (id: string) => {
+	const handleSelectGist = async () => {
 		if (!accessToken) return;
 		setError(null);
 		setUiState('sharing');
 		try {
 			const content = exportSheetMd(cells);
-			const result = await updateGist(accessToken, id, content);
+			const result = await updateGist(accessToken, selectedGistId, content);
 			setSharedGistId(result.id);
 			setSharedUrl(`${window.location.origin}?gist=${result.id}`);
+			setWasOverwrite(true);
 			setUiState('done');
 		} catch (err) {
 			setError(err instanceof Error ? err.message : 'Unknown error');
@@ -120,47 +115,121 @@ export const ShareModal = () => {
 	const handleExportFile = () => saveSheetMd(cells);
 	const handleLogout = () => setAccessToken(null);
 
-	if (!accessToken) {
-		return (
-			<LoginView onLogin={openOAuthPopup} onExportFile={handleExportFile} />
-		);
-	}
-
 	if (uiState === 'sharing') {
 		return <p className={styles.spinnerText}>Sharing…</p>;
 	}
 
 	if (uiState === 'done') {
-		return (
-			<DoneView
-				sharedUrl={sharedUrl}
-				onShareAgain={() => {
-					setUiState('idle');
-					setSharedUrl('');
-				}}
-			/>
-		);
-	}
-
-	if (uiState === 'picking') {
-		return (
-			<GistPickerView
-				gists={gists}
-				loading={gistsLoading}
-				onSelect={handleSelectGist}
-				onBack={() => setUiState('idle')}
-			/>
-		);
+		return <DoneView sharedUrl={sharedUrl} wasOverwrite={wasOverwrite} />;
 	}
 
 	return (
-		<IdleView
-			sharedGistId={sharedGistId}
-			error={error}
-			onCreateGist={handleCreateGist}
-			onOverwritePrevious={handleOverwritePrevious}
-			onPickGist={handlePickGist}
-			onLogout={handleLogout}
-		/>
+		<>
+			{error && <p className={styles.errorText}>{error}</p>}
+			{accessToken ? (
+				<>
+					<p>Name your sheet and generate a new shareable link.</p>
+					<div className={styles.inputRow}>
+						<input
+							type='text'
+							className={styles.nameInput}
+							placeholder='Sheet name...'
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+						/>
+						<button
+							type='button'
+							className={styles.wideButton}
+							disabled={name.trim() === '' || isDuplicate}
+							onClick={handleCreateGist}
+						>
+							<FaLink />
+							<span>Get link</span>
+						</button>
+					</div>
+					{isDuplicate && (
+						<div className={styles.warningText}>
+							<FaXmark />
+							<span>
+								A sheet with this name already exists. Overwrite instead in
+								option below.
+							</span>
+						</div>
+					)}
+					<div className={styles.divider}>
+						<span>or</span>
+					</div>
+					<p>Overwrite an existing sheet with the current data.</p>
+					<div className={styles.inputRow}>
+						<select
+							className={styles.gistSelect}
+							value={selectedGistId}
+							onChange={(e) => setSelectedGistId(e.target.value)}
+							disabled={gistsLoading}
+						>
+							<option value=''>
+								{gistsLoading ? 'Loading…' : 'Select a sheet…'}
+							</option>
+							{gists.map((g) => (
+								<option key={g.id} value={g.id}>
+									{g.description || g.id}
+								</option>
+							))}
+						</select>
+						<button
+							type='button'
+							className={styles.wideButton}
+							disabled={selectedGistId === ''}
+							onClick={handleSelectGist}
+						>
+							<FaFilePen />
+							<span>Overwrite</span>
+						</button>
+					</div>
+				</>
+			) : (
+				<>
+					<p>
+						Log in with GitHub to create a shareable link (uses{' '}
+						<a href='https://gist.github.com/' target='_blank' rel='noopener'>
+							Gists
+						</a>{' '}
+						under the hood).
+					</p>
+					<button
+						type='button'
+						className={styles.wideButton}
+						onClick={openOAuthPopup}
+					>
+						<FaGithub />
+						<span>Log in with GitHub</span>
+					</button>
+				</>
+			)}
+			<div className={styles.divider}>
+				<span>or</span>
+			</div>
+			<p>
+				Simply download your sheet as a <code>.sqlit.md</code> file and
+				distribute it however you want.
+			</p>
+			<button
+				type='button'
+				className={styles.wideButton}
+				onClick={handleExportFile}
+			>
+				<FaFileExport />
+				<span>Export as file</span>
+			</button>
+			{accessToken && (
+				<button
+					type='button'
+					className={styles.textButton}
+					onClick={handleLogout}
+				>
+					Log out
+				</button>
+			)}
+		</>
 	);
 };

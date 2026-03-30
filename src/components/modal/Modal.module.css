@@ -46,10 +46,15 @@
 		border 0.05s ease;
 }
 
-.wide-button:hover {
+.wide-button:hover:not(:disabled) {
 	background-color: var(--color-highlight);
 	border-color: var(--color-highlight);
 	color: var(--bg-cell);
+}
+
+.wide-button:disabled {
+	color: var(--text-secondary);
+	cursor: default;
 }
 
 .divider {
@@ -75,31 +80,36 @@
 	gap: 10px;
 }
 
+.input-row .wide-button {
+	min-width: 150px;
+}
+
 .error-text {
 	color: var(--color-error, #e53e3e);
 	font-size: 0.875rem;
 }
 
-.success-heading {
-	font-size: 1.2rem;
-	font-weight: bold;
-}
-
-.url-row {
+.warning-text {
 	display: flex;
-	gap: 8px;
+	flex-direction: row;
 	align-items: center;
+	gap: 5px;
+	color: var(--color-failure);
+	padding: 5px;
+	font-size: 0.875rem;
 }
 
-.url-input {
+.url-code {
 	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
 	border: 1px solid var(--border);
 	border-radius: 6px;
-	padding: 8px;
+	padding: 10px 15px;
 	background: var(--bg-cell);
-	color: inherit;
 	font-size: 0.875rem;
-	min-width: 0;
 }
 
 .spinner-text {
@@ -136,6 +146,13 @@
 	background-color: var(--bg-hover, rgba(0, 0, 0, 0.05));
 }
 
+.text-button {
+	color: var(--text-secondary);
+	font-size: 0.875rem;
+	margin: 0 auto;
+	width: fit-content;
+}
+
 .gist-description {
 	flex: 1;
 	overflow: hidden;
@@ -163,4 +180,15 @@
 	color: inherit;
 	font-size: 0.875rem;
 	box-sizing: border-box;
+}
+
+.gist-select {
+	flex: 1;
+	min-width: 0;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	padding: 10px 15px;
+	background: var(--bg-cell);
+	color: inherit;
+	font-size: 0.875rem;
 }
