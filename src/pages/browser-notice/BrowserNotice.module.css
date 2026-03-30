@@ -65,7 +65,7 @@
 
 .content button {
 	width: fit-content;
-	background-color: #7934c2;
+	background-color: var(--color-highlight);
 	border-radius: 8px;
 	padding: 5px 10px;
 	display: flex;

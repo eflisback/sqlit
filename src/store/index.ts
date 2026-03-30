@@ -13,4 +13,5 @@ export {
 	saveSheetMd,
 } from './sheetFile';
 export type { CellData, CellResult } from './types';
+export { useAuthStore } from './useAuthStore';
 export { useSheetStore } from './useSheetStore';
