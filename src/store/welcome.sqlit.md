@@ -43,3 +43,7 @@ if len(rows) == 0:
 ## File format
 
 The entire sqlit sheet, including executable cells, is represented by [Markdown](https://en.wikipedia.org/wiki/Markdown). This makes external editing and version tracking convenient. Try exporting this sheet using the button in the header, inspect it, make some changes, then import it back using the other button. Note that executable cells are just _code blocks_ wrapped with four backticks instead of three.
+
+## Sharing
+
+You can generate a link to your sheet by pressing _Share_ in the header and logging in with GitHub. This uses [Gists](https://docs.github.com/articles/creating-gists), which is a way of version tracking single files and storing them in the cloud. Try it out! Of course, simply exporting the file as Markdown is also possible in case you want to version track your sheets elsewhere and use another method for sharing them.
