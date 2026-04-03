@@ -63,7 +63,12 @@ export async function saveSheetMd(cells: CellData[]): Promise<void> {
 	URL.revokeObjectURL(url);
 }
 
-export function readSheetFileMd(file: File): Promise<CellData[]> {
+export async function readSheetFileMd(file: File): Promise<CellData[]> {
+	const header = new Uint8Array(await file.slice(0, 512).arrayBuffer());
+	if (header.includes(0)) {
+		throw new Error('Invalid or malformed file.');
+	}
+
 	return new Promise((resolve, reject) => {
 		const reader = new FileReader();
 		reader.onload = () => {

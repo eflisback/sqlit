@@ -1,10 +1,8 @@
 import {
 	type CSSProperties,
-	createContext,
 	type ReactNode,
 	type RefObject,
 	useCallback,
-	useContext,
 	useEffect,
 	useRef,
 	useState,
@@ -36,6 +34,7 @@ import {
 
 import { isExecutableCellData } from '@/store/types';
 import { tableToCsv, tableToMarkdown } from '@/utils/result-formatters';
+import { ContextMenuContext } from './contextMenuContext';
 import styles from './ContextMenu.module.css';
 
 interface ContextMenuState {
@@ -43,15 +42,6 @@ interface ContextMenuState {
 	x: number;
 	y: number;
 }
-
-interface ContextMenuContextValue {
-	openMenu: (cellId: string, x: number, y: number) => void;
-	closeMenu: () => void;
-}
-
-export const ContextMenuContext = createContext<ContextMenuContextValue | null>(
-	null,
-);
 
 type MenuItem =
 	| {
@@ -356,11 +346,4 @@ export const ContextMenuProvider = ({ children }: { children: ReactNode }) => {
 				)}
 		</ContextMenuContext.Provider>
 	);
-};
-
-export const useContextMenu = () => {
-	const ctx = useContext(ContextMenuContext);
-	if (!ctx)
-		throw new Error('useContextMenu must be used within ContextMenuProvider');
-	return ctx;
 };

@@ -12,12 +12,8 @@ import {
 	listSqlitGists,
 	updateGist,
 } from '@/api/github';
-import {
-	exportSheetMd,
-	saveSheetMd,
-	useAuthStore,
-	useSheetStore,
-} from '@/store';
+import { useExportSheet } from '@/hooks';
+import { exportSheetMd, useAuthStore, useSheetStore } from '@/store';
 import styles from '../Modal.module.css';
 import { DoneView } from './DoneView';
 
@@ -29,6 +25,7 @@ export const ShareModal = () => {
 	const cells = useSheetStore((state) => state.cells);
 	const sharedGistId = useSheetStore((state) => state.sharedGistId);
 	const setSharedGistId = useSheetStore((state) => state.setSharedGistId);
+	const exportSheet = useExportSheet();
 
 	const [uiState, setUiState] = useState<UiState>('idle');
 	const [gists, setGists] = useState<GistEntry[]>([]);
@@ -112,7 +109,7 @@ export const ShareModal = () => {
 		}
 	};
 
-	const handleExportFile = () => saveSheetMd(cells);
+	const handleExportFile = () => exportSheet();
 	const handleLogout = () => setAccessToken(null);
 
 	if (uiState === 'sharing') {

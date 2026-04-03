@@ -1,9 +1,9 @@
-export {
-	ContextMenuProvider,
-	useContextMenu,
-} from './context-menu/ContextMenuProvider.tsx';
+export { ContextMenuProvider } from './context-menu/ContextMenuProvider.tsx';
+export { useContextMenu } from './context-menu/contextMenuContext';
 export { ModalProvider } from './modal/ModalProvider.tsx';
 export { ShareModal } from './modal/share';
 export { useModal } from './modal/useModal';
 export { ThemeProvider } from './theme/ThemeProvider.tsx';
 export { useTheme } from './theme/useTheme';
+export { ToastProvider } from './toast/ToastProvider.tsx';
+export { useToast } from './toast/useToast.ts';

@@ -1,6 +1,7 @@
 import { useKey } from 'react-use';
 import { Cell } from '@/cells';
-import { history, saveSheetMd, useSheetStore } from '@/store';
+import { useExportSheet } from '@/hooks';
+import { history, useSheetStore } from '@/store';
 import { Header } from './Header';
 import styles from './Sheet.module.css';
 
@@ -8,13 +9,14 @@ export const Sheet = () => {
 	const cells = useSheetStore((state) => state.cells);
 	const setEditableCellId = useSheetStore((state) => state.setEditalbeCellId);
 	const anyRunning = useSheetStore((state) => state.runningCellId !== null);
+	const exportSheet = useExportSheet();
 
 	useKey('Escape', () => setEditableCellId(null));
 	useKey(
 		(e) => e.ctrlKey && e.key === 's',
 		(e) => {
 			e.preventDefault();
-			saveSheetMd(cells);
+			exportSheet();
 		},
 	);
 	useKey(

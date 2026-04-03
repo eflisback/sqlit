@@ -6,6 +6,7 @@ import {
 	ContextMenuProvider,
 	ModalProvider,
 	ThemeProvider,
+	ToastProvider,
 } from './components';
 
 // biome-ignore lint/style/noNonNullAssertion: Root element set in index.html
@@ -13,9 +14,11 @@ createRoot(document.getElementById('root')!).render(
 	<StrictMode>
 		<ThemeProvider>
 			<ContextMenuProvider>
-				<ModalProvider>
-					<App />
-				</ModalProvider>
+				<ToastProvider>
+					<ModalProvider>
+						<App />
+					</ModalProvider>
+				</ToastProvider>
 			</ContextMenuProvider>
 		</ThemeProvider>
 	</StrictMode>,

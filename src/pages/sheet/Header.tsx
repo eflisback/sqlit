@@ -8,32 +8,20 @@ import {
 	FaSun,
 } from 'react-icons/fa6';
 import { ShareModal, useModal, useTheme } from '@/components';
-import { engine } from '@/engine';
-import { readSheetFileMd, saveSheetMd, useSheetStore } from '@/store';
+import { useExportSheet, useImportSheet } from '@/hooks/useSheetFile';
 import { version } from '../../../package.json';
 import styles from './Sheet.module.css';
 
 export const Header = () => {
 	const { openModal } = useModal();
 	const { theme, setTheme } = useTheme();
-	const cells = useSheetStore((state) => state.cells);
-	const loadCells = useSheetStore((state) => state.loadCells);
 	const fileInputRef = useRef<HTMLInputElement>(null);
-
-	const handleExport = () => {
-		saveSheetMd(cells);
-	};
+	const importSheet = useImportSheet();
+	const exportSheet = useExportSheet();
 
 	const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
 		const file = e.target.files?.[0];
-		if (!file) return;
-		try {
-			const imported = await readSheetFileMd(file);
-			engine.reset();
-			loadCells(imported);
-		} catch (err) {
-			alert(`Failed to import sheet: ${(err as Error).message}`);
-		}
+		await importSheet(file);
 		e.target.value = '';
 	};
 
@@ -55,7 +43,7 @@ export const Header = () => {
 				</a>
 			</section>
 			<section className={styles.buttons}>
-				<button type='button' onClick={handleExport} title='Export sheet'>
+				<button type='button' onClick={exportSheet} title='Export sheet'>
 					<FaFileExport />
 					<span>Export</span>
 				</button>
