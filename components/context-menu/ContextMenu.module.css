@@ -1,0 +1,41 @@
+.menu {
+	position: fixed;
+	z-index: 100;
+	list-style: none;
+	padding: unset;
+	background: var(--bg-page);
+	border: 1px solid var(--border);
+	font-size: 0.875rem;
+	border-radius: 4px;
+}
+
+.item {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 10px;
+	padding: 4px 10px;
+	cursor: pointer;
+	user-select: none;
+	white-space: nowrap;
+}
+
+.item:hover {
+	background: var(--color-surface-hover);
+}
+
+.hasSubmenu {
+	position: relative;
+	cursor: default;
+}
+
+.hasSubmenu > ul {
+	position: absolute;
+	top: -1px;
+	left: 100%;
+}
+
+.disabled {
+	color: var(--text-secondary);
+	cursor: default;
+}
