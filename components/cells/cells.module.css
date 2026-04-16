@@ -1,0 +1,197 @@
+.cell {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+	width: 100%;
+	height: fit-content;
+	padding: 15px 30px;
+	border-left: 5px solid var(--border);
+}
+
+.cell:first-of-type {
+	padding-top: 45px;
+}
+
+.cell:last-of-type {
+	padding-bottom: 45px;
+}
+
+.success {
+	border-color: var(--color-success);
+}
+
+.failure {
+	border-color: var(--color-failure);
+}
+
+.loading .shimmer {
+	background: linear-gradient(
+		90deg,
+		var(--text-secondary) 0%,
+		var(--color-loading) 50%,
+		var(--text-secondary) 100%
+	);
+	background-size: 200% 100%;
+	background-clip: text;
+	-webkit-background-clip: text;
+	color: transparent;
+	animation: text-shimmer 1s linear infinite;
+}
+
+@keyframes text-shimmer {
+	from {
+		background-position: 100% 0;
+	}
+	to {
+		background-position: -100% 0;
+	}
+}
+
+.cell header {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	align-items: center;
+	font-weight: bold;
+	color: var(--text-secondary);
+	user-select: none;
+}
+
+.information,
+.editButtons {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 10px;
+}
+
+.editButtons {
+	gap: 15px;
+}
+
+.actions {
+	display: flex;
+	flex-direction: row;
+	gap: 8px;
+	align-items: center;
+}
+
+.actions button {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 5px;
+	padding: 5px 10px;
+	background-color: var(--bg-page);
+	color: var(--text-secondary);
+	border-radius: 8px;
+	font-size: 0.7em;
+}
+
+.actions button:disabled {
+	cursor: default;
+}
+
+.actions button:hover:not(:disabled) {
+	color: var(--text-primary);
+}
+
+.error {
+	font-size: 0.875rem;
+	color: var(--color-failure);
+	font-family: monospace;
+	white-space: pre-wrap;
+	margin: 0;
+}
+
+.urlInput {
+	width: 100%;
+	padding: 10px;
+	background-color: var(--bg-page);
+	color: var(--text-primary);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	font-size: 0.875rem;
+	font-family: monospace;
+}
+
+.urlInput:disabled {
+	border-color: transparent;
+}
+
+.status {
+	font-size: 0.875rem;
+	color: var(--color-success);
+}
+
+.markdownContent {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.editor * {
+	/* biome-ignore lint/complexity/noImportantStyles: Override default CodeMirror styling */
+	outline: none !important;
+}
+
+.inputForm {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 8px;
+	font-size: 0.875rem;
+	font-family: monospace;
+}
+
+.inputPrompt {
+	color: var(--text-secondary);
+	white-space: pre;
+}
+
+.inputField {
+	flex: 1;
+	padding: 4px 8px;
+	background-color: var(--bg-page);
+	color: var(--text-primary);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	font-family: monospace;
+	font-size: 0.875rem;
+}
+
+.inputForm button {
+	padding: 4px 10px;
+	background-color: var(--bg-page);
+	color: var(--text-secondary);
+	border-radius: 8px;
+	font-size: 0.875rem;
+}
+
+.inputForm button:hover {
+	color: var(--text-primary);
+}
+
+.transcript {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	font-family: monospace;
+	font-size: 0.875rem;
+}
+
+.transcriptOutput {
+	margin: 0;
+	color: var(--text-primary);
+	white-space: pre-wrap;
+}
+
+.transcriptInput {
+	margin: 0;
+	color: var(--text-secondary);
+	white-space: pre;
+}
+
+.transcriptInput span {
+	color: var(--text-primary);
+}

@@ -1,0 +1,82 @@
+import { loadPyodide, type PyodideAPI } from 'pyodide';
+import type { CellResult } from '../../store/types';
+import { isInputReady } from './input';
+import { getDb } from './sqlite';
+
+let py: PyodideAPI | null = null;
+let pyPromise: Promise<PyodideAPI> | null = null;
+
+const INPUT_OVERRIDE_PY = `import builtins, js
+def _input(prompt=''):
+    return js.requestInput(str(prompt))
+builtins.input = _input`;
+
+export const getPyInstance = (): PyodideAPI | null => py;
+
+export const getPy = async (): Promise<PyodideAPI> => {
+	if (py) return py;
+	if (!pyPromise) {
+		pyPromise = (async () => {
+			const instance = await loadPyodide({ indexURL: '/pyodide/' });
+			await instance.loadPackage('micropip');
+			await instance.runPythonAsync(
+				'import micropip; await micropip.install("sqlite3")',
+			);
+			py = instance;
+			pyPromise = null;
+			return instance;
+		})();
+	}
+	return pyPromise;
+};
+
+getPy();
+
+export const resetPython = (): void => {
+	py = null;
+	pyPromise = null;
+	getPy();
+};
+
+export const runPython = async (code: string): Promise<CellResult> => {
+	const [currentDb, s3] = await getDb();
+	const pyodide = await getPy();
+
+	const dbBytes = s3.capi.sqlite3_js_db_export(currentDb);
+	pyodide.FS.writeFile('/memory.db', dbBytes);
+	pyodide.globals.set('SQLIT_MEMORY', '/memory.db');
+
+	try {
+		pyodide.runPython(
+			'import sys, io; sys.stdout = io.StringIO(); sys.stderr = sys.stdout',
+		);
+		if (isInputReady()) {
+			pyodide.runPython(INPUT_OVERRIDE_PY);
+		}
+		await pyodide.runPythonAsync(code);
+		const output = pyodide.runPython('sys.stdout.getvalue()') as string;
+
+		const updated = pyodide.FS.readFile('/memory.db') as Uint8Array;
+		const p = s3.wasm.allocFromTypedArray(updated);
+		s3.capi.sqlite3_deserialize(
+			currentDb,
+			'main',
+			p,
+			updated.byteLength,
+			updated.byteLength,
+			s3.capi.SQLITE_DESERIALIZE_FREEONCLOSE |
+				s3.capi.SQLITE_DESERIALIZE_RESIZEABLE,
+		);
+
+		return { kind: 'text', text: output || '(no output)' };
+	} catch (e) {
+		let stdout = '';
+		try {
+			stdout = pyodide.runPython('sys.stdout.getvalue()') as string;
+		} catch {
+			/* stdout not set up */
+		}
+		const trace = e instanceof Error ? e.message : String(e);
+		return { kind: 'error', message: stdout ? `${stdout}\n${trace}` : trace };
+	}
+};

@@ -1,0 +1,194 @@
+.backdrop {
+	position: fixed;
+	inset: 0;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index: 105;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.modal {
+	background-color: var(--bg-cell);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	padding: 30px;
+	width: 500px;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+
+.modalTitle {
+	font-size: 1.6rem;
+	font-weight: bold;
+}
+
+.modal header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.wideButton {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 10px;
+	text-wrap: nowrap;
+	justify-content: center;
+	border: 1px solid var(--border);
+	padding: 10px 15px;
+	border-radius: 8px;
+	transition:
+		color 0.05s ease,
+		background 0.05s ease,
+		border 0.05s ease;
+}
+
+.wideButton:hover:not(:disabled) {
+	background-color: var(--color-highlight);
+	border-color: var(--color-highlight);
+	color: var(--bg-cell);
+}
+
+.wideButton:disabled {
+	color: var(--text-secondary);
+	cursor: default;
+}
+
+.divider {
+	width: 100%;
+	height: 1px;
+	background-color: var(--border);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 10px 0;
+}
+
+.divider > span {
+	color: var(--text-secondary);
+	background-color: var(--bg-cell);
+	padding: 0 5px;
+	font-size: 0.875rem;
+}
+
+.inputRow {
+	display: flex;
+	flex-direction: row;
+	gap: 10px;
+}
+
+.inputRow .wideButton {
+	min-width: 150px;
+}
+
+.errorText {
+	color: var(--color-error, #e53e3e);
+	font-size: 0.875rem;
+}
+
+.warningText {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 5px;
+	color: var(--color-failure);
+	padding: 5px;
+	font-size: 0.875rem;
+}
+
+.urlCode {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	padding: 10px 15px;
+	background: var(--bg-cell);
+	font-size: 0.875rem;
+}
+
+.spinnerText {
+	color: var(--color-muted, #888);
+}
+
+.gistList {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	max-height: 240px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.gistItem {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+	padding: 8px 10px;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	background: none;
+	cursor: pointer;
+	text-align: left;
+	transition: background 0.05s ease;
+}
+
+.gistItem:hover {
+	background-color: var(--bg-hover, rgba(0, 0, 0, 0.05));
+}
+
+.textButton {
+	color: var(--text-secondary);
+	font-size: 0.875rem;
+	margin: 0 auto;
+	width: fit-content;
+}
+
+.gistDescription {
+	flex: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.gistDate {
+	font-size: 0.8rem;
+	color: var(--color-muted, #888);
+	white-space: nowrap;
+}
+
+.noticeText {
+	font-size: 0.875rem;
+	color: var(--color-muted, #888);
+}
+
+.nameInput {
+	width: 100%;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	padding: 10px 15px;
+	background: var(--bg-cell);
+	color: inherit;
+	font-size: 0.875rem;
+	box-sizing: border-box;
+}
+
+.gistSelect {
+	flex: 1;
+	min-width: 0;
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	padding: 10px 15px;
+	background: var(--bg-cell);
+	color: inherit;
+	font-size: 0.875rem;
+}
