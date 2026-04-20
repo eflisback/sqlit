@@ -1,10 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { history } from './history';
-import { importSheetMd } from './sheetFile';
 import type { CellData } from './types';
 import { isExecutableCellData } from './types';
-import welcomeContent from './welcome-content';
 
 interface SheetStore {
 	cells: CellData[];
@@ -24,12 +22,7 @@ interface SheetStore {
 export const useSheetStore = create<SheetStore>()(
 	persist(
 		(set) => ({
-			cells: importSheetMd(
-				welcomeContent.replace(
-					'{{ORIGIN}}',
-					typeof window !== 'undefined' ? window.location.origin : '',
-				),
-			),
+			cells: [],
 			insertCell: (cellData, index) =>
 				set((prev) => ({
 					cells: [
@@ -69,15 +62,8 @@ export const useSheetStore = create<SheetStore>()(
 		}),
 		{
 			name: 'sheet',
-			version: 1,
-			migrate: () => ({
-				cells: importSheetMd(
-					welcomeContent.replace(
-						'{{ORIGIN}}',
-						typeof window !== 'undefined' ? window.location.origin : '',
-					),
-				),
-			}),
+			version: 2,
+			migrate: (): Partial<SheetStore> => ({ cells: [] }),
 			partialize: (state) => ({
 				cells: state.cells.map(
 					(cell): CellData =>

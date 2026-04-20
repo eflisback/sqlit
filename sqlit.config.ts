@@ -1,11 +1,7 @@
-export interface SheetConfig {
-	name: string;
-	description: string;
-	gistId: string;
-}
+import type { SqlitConfig } from '@/lib/types/config';
 
-const config = {
-	sheets: [] as SheetConfig[],
+const config: SqlitConfig = {
+	sheets: [],
 };
 
 export default config;

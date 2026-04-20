@@ -1,54 +1,35 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { fetchGist } from '@/lib/api/github';
-import { engine } from '@/lib/engine';
-import { importSheetMd, useSheetStore } from '@/lib/store';
+import { useState } from 'react';
 import { BrowserNotice } from './BrowserNotice';
 import { ErrorSheet } from './ErrorSheet';
 import { LoadingSheet } from './LoadingSheet';
 import { Sheet } from './Sheet';
+import { useSheetSource } from './useSheetSource';
 
-interface Props {
-	gistId: string | null;
+export interface SheetLoaderProps {
+	gistId?: string;
+	remoteUrl?: string;
+	blank?: boolean;
 }
 
-export function SheetLoader({ gistId }: Props) {
-	const loadCells = useSheetStore((state) => state.loadCells);
+export function SheetLoader({ gistId, remoteUrl, blank }: SheetLoaderProps) {
 	const [browserNotice, setBrowserNotice] = useState(
 		typeof window !== 'undefined' && !window.crossOriginIsolated,
 	);
-	const [gistState, setGistState] = useState<'idle' | 'loading' | 'error'>(
-		'idle',
-	);
-	const [gistError, setGistError] = useState<string | null>(null);
+	const { loadState, loadError, clearError } = useSheetSource({
+		gistId,
+		remoteUrl,
+		blank,
+	});
 
-	useEffect(() => {
-		if (!gistId) return;
+	if (loadState === 'loading') return <LoadingSheet />;
 
-		setGistState('loading');
-		fetchGist(gistId)
-			.then((markdown) => {
-				const cells = importSheetMd(markdown);
-				engine.reset();
-				loadCells(cells);
-				setGistState('idle');
-			})
-			.catch((err) => {
-				setGistError(
-					err instanceof Error ? err.message : 'Failed to load shared sheet',
-				);
-				setGistState('error');
-			});
-	}, [gistId, loadCells]);
-
-	if (gistState === 'loading') return <LoadingSheet />;
-
-	if (gistState === 'error') {
+	if (loadState === 'error') {
 		return (
 			<ErrorSheet
-				error={`Shared sheet not available.${gistError ? ` (${gistError})` : ''}`}
-				onContinue={() => setGistState('idle')}
+				error={`Sheet not available.${loadError ? ` (${loadError})` : ''}`}
+				onContinue={clearError}
 			/>
 		);
 	}
