@@ -47,9 +47,11 @@ Python's `input()` is intercepted using a **SharedArrayBuffer**-based protocol (
 
 ### State Management
 
-Zustand store (`lib/store/useSheetStore.ts`) holds all cell data and is persisted to localStorage under the key `sheet` (version 1). Results are **not** persisted — only cell content (code/query text). Sheet files can be exported/imported in two formats:
+Zustand store (`lib/store/useSheetStore.ts`) holds all cell data and is persisted to localStorage under the key `sheet` (version 2). Results are **not** persisted — only cell content (code/query text). Sheet files can be exported/imported in two formats (`lib/store/sheetFile.ts`):
 - **JSON** — validated with Zod schemas (`lib/store/schema.ts`), version-tagged
 - **Markdown** — custom `.sqlit.md` format using 4-backtick fenced blocks (` ````sql `, ` ````python `, ` ````load `); plain text between blocks becomes Markdown cells
+
+Cell mutations go through a command pattern (`lib/store/commands.ts`) — each action (insert, remove, update, move cell) is a `Command` class pushed onto a history stack (`lib/store/history.ts`) for undo/redo. Adjacent markdown cells are auto-merged on import, and their merged state is tracked so undo can properly unmerge them.
 
 ### Cell Types
 
@@ -58,17 +60,17 @@ Zustand store (`lib/store/useSheetStore.ts`) holds all cell data and is persiste
 - **Load** — URL input, fetches a `.sqlite` database via `loadFromUrl()`
 - **Markdown** — CodeMirror editor with rendered preview
 
-Cell rendering: `Cell.tsx` dispatches to `ExecutableCell` (SQL/Python/Load) or `MarkdownCell`. `CellShell.tsx` provides the common UI wrapper (header, run button, move/delete). `CellResult` is typed as `{ kind: 'table' | 'text' | 'error'; ... }`.
+Cell rendering: `components/cells/Cell.tsx` dispatches to `ExecutableCell` (SQL/Python/Load) or `MarkdownCell`. `components/cells/CellShell.tsx` provides the common UI wrapper (header, run button, move/delete). `components/cells/useRunCell.ts` manages per-cell execution state. `CellResult` is typed as `{ kind: 'table' | 'text' | 'error'; ... }` (`lib/store/types.ts`).
 
-### After Larger Edits
+### Routing
 
-After implementing a plan or making larger edits, always run these before asking for review:
+The notebook is at `app/sheet/page.tsx`. On startup it checks `?gist=<id>` and loads the sheet via `fetchGist()`. `components/sheet/BrowserNotice.tsx` renders instead of the notebook when `window.crossOriginIsolated` is false (SharedArrayBuffer unavailable — required for Python `input()`).
 
-```bash
-pnpm format   # Auto-fixes formatting
-pnpm lint     # Check for lint errors
-pnpm test     # Run test suite
-```
+**Keyboard shortcuts** (implemented in `components/sheet/Sheet.tsx`):
+- `Ctrl+Z` — undo
+- `Ctrl+Shift+Z` — redo
+- `Ctrl+S` — export sheet
+- `Escape` — deselect cell
 
 ### Sharing via GitHub Gists
 
@@ -84,8 +86,19 @@ Sharing flow:
 
 Loading a shared sheet: app checks for `?gist=<id>` on startup and calls `fetchGist()` (no auth required for public/unlisted gists).
 
-### Conventions
+## After Larger Edits
+
+After implementing a plan or making larger edits, always run these before asking for review:
+
+```bash
+pnpm format   # Auto-fixes formatting
+pnpm lint     # Check for lint errors
+pnpm test     # Run test suite
+```
+
+## Conventions
 
 - Path alias `@/` maps to the project root (e.g. `@/lib/...`, `@/components/...`)
 - Biome for linting and formatting (tabs, single quotes)
 - CSS modules with **camelCase** class names in both `.module.css` files and TSX access (e.g. `.noticeHeader` in CSS, `styles.noticeHeader` in TSX). Next.js hardcodes `exportLocalsConvention: 'asIs'` — no automatic kebab→camelCase translation.
+- Props interfaces for React components are named `ComponentNameProps` (e.g. `SheetLoaderProps` for `SheetLoader`)
