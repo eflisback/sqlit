@@ -6,5 +6,7 @@ interface Props {
 
 export default async function SheetPage({ searchParams }: Props) {
 	const { gist, url, blank } = await searchParams;
-	return <SheetLoader gistId={gist} remoteUrl={url} blank={blank !== undefined} />;
+	return (
+		<SheetLoader gistId={gist} remoteUrl={url} blank={blank !== undefined} />
+	);
 }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { fetchGist } from '@/lib/api/github';
 import { engine } from '@/lib/engine';
@@ -24,6 +25,7 @@ export function useSheetSource({
 	remoteUrl,
 	blank,
 }: UseSheetSourceOptions): UseSheetSourceResult {
+	const router = useRouter();
 	const loadCells = useSheetStore((state) => state.loadCells);
 	const [loadState, setLoadState] = useState<LoadState>('idle');
 	const [loadError, setLoadError] = useState<string | null>(null);
@@ -42,6 +44,7 @@ export function useSheetSource({
 					engine.reset();
 					loadCells(importSheetMd(markdown));
 					setLoadState('idle');
+					router.replace('/sheet');
 				})
 				.catch((err) => {
 					setLoadError(
@@ -63,6 +66,7 @@ export function useSheetSource({
 					engine.reset();
 					loadCells(importSheetMd(markdown));
 					setLoadState('idle');
+					router.replace('/sheet');
 				})
 				.catch((err) => {
 					setLoadError(
@@ -71,7 +75,7 @@ export function useSheetSource({
 					setLoadState('error');
 				});
 		}
-	}, [gistId, remoteUrl, blank, loadCells]);
+	}, [gistId, remoteUrl, blank, loadCells, router.replace]);
 
 	return {
 		loadState,

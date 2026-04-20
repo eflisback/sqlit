@@ -4,12 +4,12 @@ const config: SqlitConfig = {
 	sheets: [
 		{
 			name: 'Welcome to sqlit',
-			description: '',
+			description: 'Run some SQL queries and Python code in the browser in this interactive introduction to sqlit.',
 			source: {
 				type: 'url',
-				url: 'https://raw.githubusercontent.com/eflisback/sqlit/8070c3dfc1f5b04cbc1713e9d8d025fe1ee867cd/src/store/welcome.sqlit.md'
-			}
-		}
+				url: 'https://raw.githubusercontent.com/eflisback/sqlit/refs/heads/main/sheets/welcome.sqlit.md',
+			},
+		},
 	],
 };
 

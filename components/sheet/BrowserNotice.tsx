@@ -12,7 +12,7 @@ interface BrowserNoticeProps {
 const content = (exitBrowserNotice: () => void) => (
 	<>
 		<section className={styles.logo}>
-			<Image src='/logo.svg' alt='sqlit logo' width={32} height={32} />
+			<Image src='/logo.svg' alt='sqlit logo' width={32} height={32} priority />
 			<span>sqlit</span>
 		</section>
 		<header className={styles.noticeHeader}>
