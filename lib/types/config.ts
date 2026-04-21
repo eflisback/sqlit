@@ -1,13 +1,14 @@
-export type SheetSource =
-	| { type: 'gist'; gistId: string }
-	| { type: 'url'; url: string };
+type SheetBase = { name: string; description: string };
 
-export interface SheetConfig {
+export type SheetConfig =
+	| (SheetBase & { gistId: string; fileUrl?: never })
+	| (SheetBase & { fileUrl: string; gistId?: never });
+
+export interface SheetCategory {
 	name: string;
-	description: string;
-	source: SheetSource;
+	sheets: SheetConfig[];
 }
 
 export interface SqlitConfig {
-	sheets: SheetConfig[];
+	categories: SheetCategory[];
 }

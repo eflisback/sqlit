@@ -1,0 +1,128 @@
+.root {
+	display: flex;
+	flex-direction: column;
+	gap: 30px;
+	user-select: none;
+}
+
+.sectionLabel {
+	font-size: 0.875rem;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--text-secondary);
+	margin-bottom: 10px;
+}
+
+.grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 15px;
+}
+
+.quickGrid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 15px;
+}
+
+.card {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+	padding: 30px;
+	background-color: var(--bg-cell);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	color: inherit;
+	transition: background-color 0.05s ease;
+}
+
+.card:hover {
+	background-color: var(--bg-page);
+}
+
+.cardHeader {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 8px;
+}
+
+.badge {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background-color: var(--color-highlight);
+	color: var(--bg-cell);
+	font-size: 0.7rem;
+	font-weight: 700;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.quickCard {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 15px;
+	padding: 30px;
+	background-color: var(--bg-cell);
+	border: 1px solid var(--border);
+	border-radius: 8px;
+	color: inherit;
+	transition: background-color 0.05s ease;
+}
+
+.quickCard:not(.cardDisabled):hover {
+	background-color: var(--bg-page);
+}
+
+.quickBadge {
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	background-color: var(--color-highlight);
+	color: var(--bg-cell);
+	font-size: 0.9rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-shrink: 0;
+}
+
+.quickCardText {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.cardDisabled {
+	opacity: 0.45;
+	cursor: default;
+	pointer-events: none;
+}
+
+.cardName {
+	font-weight: 600;
+	font-size: 0.95rem;
+}
+
+.cardDescription {
+	color: var(--text-secondary);
+	font-size: 0.8rem;
+	line-height: 1.45;
+	display: -webkit-box;
+	line-clamp: 2;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+@media (max-width: 600px) {
+	.quickGrid {
+		grid-template-columns: 1fr;
+	}
+}
