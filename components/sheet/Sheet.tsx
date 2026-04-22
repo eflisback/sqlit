@@ -4,6 +4,7 @@ import { useKey } from 'react-use';
 import { Cell } from '@/components/cells';
 import { useExportSheet } from '@/lib/hooks';
 import { history, useSheetStore } from '@/lib/store';
+import { EmptySheet } from './EmptySheet';
 import styles from './Sheet.module.css';
 
 export const Sheet = () => {
@@ -40,6 +41,8 @@ export const Sheet = () => {
 			if (!anyRunning) history.redo();
 		},
 	);
+
+	if (cells.length === 0) return <EmptySheet />;
 
 	return (
 		<main className={styles.sheet}>
