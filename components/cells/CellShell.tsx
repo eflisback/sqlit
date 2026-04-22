@@ -2,8 +2,8 @@
 
 import { forwardRef } from 'react';
 import type { IconType } from 'react-icons';
-import { useContextMenu } from '@/components/context-menu/contextMenuContext';
-import { useSheetStore } from '@/lib/store';
+import { useContextMenu } from '../context-menu/contextMenuContext';
+import { useSheetStore } from '@/lib';
 import styles from './cells.module.css';
 import type { CellStatus } from './types';
 

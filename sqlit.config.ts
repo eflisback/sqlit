@@ -1,4 +1,4 @@
-import type { SqlitConfig } from '@/lib/types/config';
+import type { SqlitConfig } from '@/lib';
 
 const config: SqlitConfig = {
 	categories: [

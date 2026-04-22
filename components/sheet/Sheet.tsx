@@ -1,9 +1,8 @@
 'use client';
 
 import { useKey } from 'react-use';
-import { Cell } from '@/components/cells';
-import { useExportSheet } from '@/lib/hooks';
-import { history, useSheetStore } from '@/lib/store';
+import { Cell } from '../cells/Cell';
+import { history, useExportSheet, useSheetStore } from '@/lib';
 import { EmptySheet } from './EmptySheet';
 import styles from './Sheet.module.css';
 

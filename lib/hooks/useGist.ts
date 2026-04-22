@@ -6,14 +6,11 @@ import {
 	type GistEntry,
 	listSqlitGists,
 	updateGist,
-} from '@/lib/api/github';
-import { engine } from '@/lib/engine';
-import {
-	exportSheetMd,
-	importSheetMd,
-	useAuthStore,
-	useSheetStore,
-} from '@/lib/store';
+} from '../api/github';
+import { engine } from '../engine/wrapper';
+import { exportSheetMd, importSheetMd } from '../store/sheetFile';
+import { useAuthStore } from '../store/useAuthStore';
+import { useSheetStore } from '../store/useSheetStore';
 
 export const useLoadGist = () => {
 	const loadCells = useSheetStore((state) => state.loadCells);

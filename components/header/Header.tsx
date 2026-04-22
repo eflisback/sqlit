@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useRef } from 'react';
 import { FaFileExport, FaFileImport, FaGitAlt, FaShare } from 'react-icons/fa6';
-import { useModal } from '@/components/modal/useModal';
-import { ShareModal } from '@/components/modal/share';
-import { useExportSheet, useImportSheet } from '@/lib/hooks/useSheetFile';
+import { useExportSheet, useImportSheet } from '@/lib';
+import { useModal } from '../modal/useModal';
+import { ShareModal } from '../modal/share/ShareModal';
 import { version } from '../../package.json';
 import styles from './Header.module.css';
 

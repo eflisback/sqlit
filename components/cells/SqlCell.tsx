@@ -2,9 +2,8 @@
 
 import { sql } from '@codemirror/lang-sql';
 import CodeMirror from '@uiw/react-codemirror';
-import { useColorScheme } from '@/lib/hooks/useColorScheme';
-import { useSheetStore } from '@/lib/store';
-import type { SqlCellData } from '@/lib/store/types';
+import { useColorScheme, useSheetStore } from '@/lib';
+import type { SqlCellData } from '@/lib';
 import { CellOutput } from './CellOutput';
 import { useDebouncedCallback } from './useDebouncedCallback';
 

@@ -1,7 +1,7 @@
 'use client';
 
-import type { LoadCellData } from '@/lib/store/types';
-import { useSheetStore } from '@/lib/store';
+import { useSheetStore } from '@/lib';
+import type { LoadCellData } from '@/lib';
 import { CellOutput } from './CellOutput';
 import styles from './cells.module.css';
 

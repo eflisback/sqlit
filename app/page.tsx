@@ -1,7 +1,5 @@
 import { FaPlus } from 'react-icons/fa6';
-import { QuickCard } from '@/components/sheet-cards/QuickCard';
-import { ResumeCard } from '@/components/sheet-cards/ResumeCard';
-import { SheetCard, sheetKey } from '@/components/sheet-cards/SheetCard';
+import { QuickCard, ResumeCard, SheetCard, sheetKey } from '@/components';
 import config from '@/sqlit.config';
 import styles from './page.module.css';
 import listStyles from '@/components/sheet-cards/sheet-cards.module.css';

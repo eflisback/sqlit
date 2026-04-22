@@ -10,12 +10,14 @@ import {
 } from 'react-icons/fa6';
 import {
 	createGist,
+	exportSheetMd,
 	type GistEntry,
 	listSqlitGists,
 	updateGist,
-} from '@/lib/api/github';
-import { useExportSheet } from '@/lib/hooks';
-import { exportSheetMd, useAuthStore, useSheetStore } from '@/lib/store';
+	useAuthStore,
+	useExportSheet,
+	useSheetStore,
+} from '@/lib';
 import styles from '../Modal.module.css';
 import { DoneView } from './DoneView';
 

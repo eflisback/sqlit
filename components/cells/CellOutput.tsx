@@ -1,6 +1,6 @@
 'use client';
 
-import type { CellResult } from '@/lib/store/types';
+import type { CellResult } from '@/lib';
 import styles from './cells.module.css';
 
 interface CellOutputProps {

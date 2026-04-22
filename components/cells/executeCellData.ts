@@ -1,5 +1,5 @@
-import { engine } from '@/lib/engine';
-import type { CellResult, ExecutableCellData } from '@/lib/store/types';
+import { engine } from '@/lib';
+import type { CellResult, ExecutableCellData } from '@/lib';
 
 export async function executeCellData(
 	cellData: ExecutableCellData,

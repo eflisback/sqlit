@@ -1,4 +1,4 @@
-import { SheetLoader } from '@/components/sheet/SheetLoader';
+import { SheetLoader } from '@/components';
 
 interface Props {
 	searchParams: Promise<{ gist?: string; url?: string; blank?: string }>;

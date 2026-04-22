@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { onInputRequest, submitInput } from '@/lib/engine/wrapper';
-import type { CellResult } from '@/lib/store/types';
+import { onInputRequest, submitInput } from '@/lib';
+import type { CellResult } from '@/lib';
 
 export type TranscriptItem =
 	| { kind: 'output'; text: string }

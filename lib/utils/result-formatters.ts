@@ -1,5 +1,5 @@
 import type { SqlValue } from '@sqliteai/sqlite-wasm';
-import type { CellResult } from '@/lib/store';
+import type { CellResult } from '../store/types';
 
 export type TableResult = Extract<CellResult, { kind: 'table' }>;
 

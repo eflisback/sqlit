@@ -1,9 +1,8 @@
 'use client';
 
 import { useCallback } from 'react';
-import { useSheetStore } from '@/lib/store';
-import type { CellData, ExecutableCellData } from '@/lib/store/types';
-import { isExecutableCellData } from '@/lib/store/types';
+import { isExecutableCellData, useSheetStore } from '@/lib';
+import type { CellData, ExecutableCellData } from '@/lib';
 import { executeCellData } from './executeCellData';
 import type { CellStatus } from './types';
 

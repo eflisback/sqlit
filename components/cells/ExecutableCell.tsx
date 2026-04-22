@@ -9,8 +9,8 @@ import {
 	FaPlay,
 	FaPython,
 } from 'react-icons/fa6';
-import type { ExecutableCellData } from '@/lib/store/types';
-import { useSheetStore } from '@/lib/store';
+import { useSheetStore } from '@/lib';
+import type { ExecutableCellData } from '@/lib';
 import { CellShell } from './CellShell';
 import styles from './cells.module.css';
 import { LoadCell } from './LoadCell';

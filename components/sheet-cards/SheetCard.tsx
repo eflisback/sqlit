@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import type { SheetConfig } from '@/lib/types/config';
+import type { SheetConfig } from '@/lib';
 import styles from './sheet-cards.module.css';
 
 export function sheetHref(sheet: SheetConfig): string {

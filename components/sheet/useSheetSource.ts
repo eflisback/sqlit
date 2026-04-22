@@ -2,9 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { fetchGist } from '@/lib/api/github';
-import { engine } from '@/lib/engine';
-import { importSheetMd, useSheetStore } from '@/lib/store';
+import { engine, fetchGist, importSheetMd, useSheetStore } from '@/lib';
 
 type LoadState = 'idle' | 'loading' | 'error';
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { memo } from 'react';
-import { type CellData, isExecutableCellData } from '@/lib/store/types';
+import { type CellData, isExecutableCellData } from '@/lib';
 import { ExecutableCell } from './ExecutableCell';
 import { MarkdownCell } from './MarkdownCell';
 

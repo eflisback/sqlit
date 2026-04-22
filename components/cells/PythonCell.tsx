@@ -2,9 +2,8 @@
 
 import { python } from '@codemirror/lang-python';
 import CodeMirror from '@uiw/react-codemirror';
-import { useColorScheme } from '@/lib/hooks/useColorScheme';
-import { useSheetStore } from '@/lib/store';
-import type { PythonCellData } from '@/lib/store/types';
+import { useColorScheme, useSheetStore } from '@/lib';
+import type { PythonCellData } from '@/lib';
 import { CellOutput } from './CellOutput';
 import styles from './cells.module.css';
 import { useDebouncedCallback } from './useDebouncedCallback';

@@ -29,12 +29,13 @@ import { useKey } from 'react-use';
 import {
 	history,
 	InsertCellCommand,
+	isExecutableCellData,
 	MoveCellCommand,
 	RemoveCellCommand,
+	tableToCsv,
+	tableToMarkdown,
 	useSheetStore,
-} from '@/lib/store';
-import { isExecutableCellData } from '@/lib/store/types';
-import { tableToCsv, tableToMarkdown } from '@/lib/utils/result-formatters';
+} from '@/lib';
 import { ContextMenuContext } from './contextMenuContext';
 import styles from './ContextMenu.module.css';
 

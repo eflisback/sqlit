@@ -6,8 +6,7 @@ import {
 	FaMarkdown,
 	FaPython,
 } from 'react-icons/fa6';
-import { InsertCellCommand } from '@/lib/store/commands';
-import { history } from '@/lib/store';
+import { history, InsertCellCommand } from '@/lib';
 import styles from './EmptySheet.module.css';
 
 export const EmptySheet = () => {

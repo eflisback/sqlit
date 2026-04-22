@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono, VT323 } from 'next/font/google';
 import '@/styles/globals.css';
-import { Header } from '@/components/header/Header';
-import { Providers } from '@/components/Providers';
+import { Header, Providers } from '@/components';
 
 const geistSans = Geist({
 	variable: '--font-geist-sans',

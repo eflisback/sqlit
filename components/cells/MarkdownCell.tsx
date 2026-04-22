@@ -6,9 +6,8 @@ import CodeMirror from '@uiw/react-codemirror';
 import { FaMarkdown } from 'react-icons/fa6';
 import Markdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { useColorScheme } from '@/lib/hooks/useColorScheme';
-import { useSheetStore } from '@/lib/store';
-import type { MarkdownCellData } from '@/lib/store/types';
+import { useColorScheme, useSheetStore } from '@/lib';
+import type { MarkdownCellData } from '@/lib';
 import { CellShell } from './CellShell';
 import { useDebouncedCallback } from './useDebouncedCallback';
 

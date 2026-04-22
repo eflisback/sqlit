@@ -1,7 +1,7 @@
 'use client';
 
 import { FaRotateLeft } from 'react-icons/fa6';
-import { useSheetStore } from '@/lib/store';
+import { useSheetStore } from '@/lib';
 import { QuickCard } from './QuickCard';
 
 export function ResumeCard() {
