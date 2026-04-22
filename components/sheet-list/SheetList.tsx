@@ -57,7 +57,7 @@ function QuickCard({
 			<div
 				className={className}
 				aria-disabled='true'
-				title='Open a sheet first to resume it'
+				title='No saved work yet.'
 			>
 				{inner}
 			</div>
@@ -83,7 +83,9 @@ function SheetCard({ index, sheet }: SheetCardProps) {
 				<span className={styles.badge}>{index}</span>
 				<span className={styles.cardName}>{sheet.name}</span>
 			</span>
-			<span className={styles.cardDescription}>{sheet.description}</span>
+			<span className={styles.cardDescription} title={sheet.description}>
+				{sheet.description}
+			</span>
 		</Link>
 	);
 }

@@ -3,7 +3,7 @@ import type { SqlitConfig } from '@/lib/types/config';
 const config: SqlitConfig = {
 	categories: [
 		{
-			name: 'Introduction',
+			name: 'Docs',
 			sheets: [
 				{
 					name: 'Welcome to sqlit',
@@ -13,39 +13,44 @@ const config: SqlitConfig = {
 						'https://raw.githubusercontent.com/eflisback/sqlit/refs/heads/main/sheets/welcome.sqlit.md',
 				},
 				{
-					name: 'Sales Dashboard',
+					name: 'Why sqlit?',
 					description:
-						'Explore regional sales trends and product performance metrics across quarters.',
+						'Who is this tool intended for? In what cases would you choose it over other, more established tools?',
 					fileUrl: 'https://example.com/sheets/sales-dashboard.sqlit.md',
 				},
 				{
-					name: 'User Analytics',
+					name: 'Techy stuff',
 					description:
-						'Query user retention, session data, and funnel drop-off rates over time.',
+						'Capabilities, limitations, and more technical details about sqlit and its dependencies.',
 					fileUrl: 'https://example.com/sheets/user-analytics.sqlit.md',
 				},
 			],
 		},
 		{
-			name: 'Operations',
+			name: 'Examples',
 			sheets: [
 				{
-					name: 'Inventory Report',
+					name: 'SQL Basics',
 					description:
-						'Track stock levels, reorder points, and supplier lead times in real time.',
+						'Introduction to databases with SQLite.',
 					fileUrl: 'https://example.com/sheets/inventory-report.sqlit.md',
 				},
 				{
-					name: 'Log Explorer',
+					name: 'SQL Exercises',
 					description:
-						'Dig into application logs to surface errors, slowdowns, and anomalies.',
-					fileUrl: 'https://example.com/sheets/log-explorer.sqlit.md',
+						'Practice writing some SQL queries.',
+					fileUrl: 'https://example.com/sheets/log-bruh.sqlit.md',
 				},
 				{
-					name: 'Finance Overview',
+					name: 'Python Basics',
+					description: 'Introduction to the Python programming language',
+					fileUrl: 'https://example.com/sheets/python.sqlit.md'
+				},
+				{
+					name: 'Python Exercises',
 					description:
-						'Month-over-month revenue, expenses, and margin breakdown by department.',
-					fileUrl: 'https://example.com/sheets/finance-overview.sqlit.md',
+						'Practice writing some SQL queries with Python.',
+					fileUrl: 'https://example.com/sheets/log-explorer.sqlit.md',
 				},
 			],
 		},
