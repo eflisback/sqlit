@@ -12,8 +12,6 @@ con = sqlite3.connect(SQLIT_MEMORY)
 print(con.execute("SELECT * FROM buildings").fetchall())
 ````
 
----
-
 ## Exercise 1
 
 Query all buildings and print just their **names**, one per line.
