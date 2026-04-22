@@ -5,8 +5,11 @@
 	"scripts": {
 		"setup:pyodide": "node scripts/fetch-pyodide.mjs",
 		"dev": "next dev",
+		"prebuild": "node scripts/fetch-pyodide.mjs",
 		"build": "next build",
-		"build:standalone": "NEXT_OUTPUT=standalone next build",
+		"prebuild:standalone": "node scripts/fetch-pyodide.mjs",
+		"build:standalone": "NEXT_OUTPUT=standalone next build && cp -r public/. .next/standalone/public && cp -r .next/static/. .next/standalone/.next/static",
+		"serve": "node .next/standalone/server.js",
 		"start": "next start",
 		"lint": "biome lint",
 		"format": "biome format --write",

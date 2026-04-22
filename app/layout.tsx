@@ -21,6 +21,7 @@ const vt323 = VT323({
 });
 
 export const metadata: Metadata = {
+	metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL ?? 'http://localhost:3000'),
 	title: 'sqlit',
 	description: 'An SQL notebook that runs entirely in the browser.',
 	applicationName: 'sqlit',
