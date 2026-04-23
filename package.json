@@ -46,6 +46,7 @@
 		"@types/react-dom": "^19.2.3",
 		"@types/react-syntax-highlighter": "^15.5.13",
 		"babel-plugin-react-compiler": "^1.0.0",
+		"raw-loader": "^4.0.2",
 		"typescript": "~5.9.3"
 	}
 }

@@ -1,6 +1,6 @@
 # Python Exercises
 
-Practice querying a database from Python. The database below has a single table — **buildings** — with columns: `id`, `name`, `city`, `height`, `floors`, `completion_year`.
+Practice querying a database from Python. The database below has a single table, **buildings**, with columns: `id`, `name`, `city`, `height`, `floors`, `completion_year`.
 
 ````load
 https://sqlit.ebbe.dev/examples/buildings.sqlite

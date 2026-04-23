@@ -11,9 +11,15 @@ export interface SheetLoaderProps {
 	gistId?: string;
 	remoteUrl?: string;
 	blank?: boolean;
+	markdown?: string;
 }
 
-export function SheetLoader({ gistId, remoteUrl, blank }: SheetLoaderProps) {
+export function SheetLoader({
+	gistId,
+	remoteUrl,
+	blank,
+	markdown,
+}: SheetLoaderProps) {
 	const [browserNotice, setBrowserNotice] = useState(
 		typeof window !== 'undefined' && !window.crossOriginIsolated,
 	);
@@ -21,6 +27,7 @@ export function SheetLoader({ gistId, remoteUrl, blank }: SheetLoaderProps) {
 		gistId,
 		remoteUrl,
 		blank,
+		markdown,
 	});
 
 	if (loadState === 'loading') return <LoadingSheet />;

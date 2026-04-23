@@ -42,5 +42,6 @@ export { isExecutableCellData } from './store/types';
 export { useAuthStore } from './store/useAuthStore';
 export { useSheetStore } from './store/useSheetStore';
 export type { SheetCategory, SheetConfig, SqlitConfig } from './types/config';
+export { flatSheets } from './utils/config';
 export { tableToCsv, tableToMarkdown } from './utils/result-formatters';
 export type { TableResult } from './utils/result-formatters';

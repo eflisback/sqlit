@@ -1,10 +1,13 @@
 import { FaPlus } from 'react-icons/fa6';
-import { QuickCard, ResumeCard, SheetCard, sheetKey } from '@/components';
+import { QuickCard, ResumeCard, SheetCard } from '@/components';
+import { flatSheets } from '@/lib/utils/config';
 import config from '@/sqlit.config';
 import styles from './page.module.css';
 import listStyles from '@/components/sheet-cards/sheet-cards.module.css';
 
 export default function HomePage() {
+	const allSheets = flatSheets();
+
 	return (
 		<main className={styles.page}>
 			<div className={listStyles.root}>
@@ -24,9 +27,17 @@ export default function HomePage() {
 					<section key={category.name}>
 						<p className={listStyles.sectionLabel}>{category.name}</p>
 						<div className={listStyles.grid}>
-							{category.sheets.map((sheet, i) => (
-								<SheetCard key={sheetKey(sheet)} index={i + 1} sheet={sheet} />
-							))}
+							{category.sheets.map((sheet, i) => {
+								const localIndex = allSheets.indexOf(sheet);
+								return (
+									<SheetCard
+										key={localIndex}
+										index={i + 1}
+										localIndex={localIndex}
+										sheet={sheet}
+									/>
+								);
+							})}
 						</div>
 					</section>
 				))}

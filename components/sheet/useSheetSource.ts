@@ -16,12 +16,14 @@ interface UseSheetSourceOptions {
 	gistId?: string;
 	remoteUrl?: string;
 	blank?: boolean;
+	markdown?: string;
 }
 
 export function useSheetSource({
 	gistId,
 	remoteUrl,
 	blank,
+	markdown,
 }: UseSheetSourceOptions): UseSheetSourceResult {
 	const router = useRouter();
 	const loadCells = useSheetStore((state) => state.loadCells);
@@ -29,9 +31,17 @@ export function useSheetSource({
 	const [loadError, setLoadError] = useState<string | null>(null);
 
 	useEffect(() => {
+		if (markdown) {
+			engine.reset();
+			loadCells(importSheetMd(markdown));
+			router.replace('/sheet');
+			return;
+		}
+
 		if (blank) {
 			engine.reset();
 			loadCells([]);
+			router.replace('/sheet');
 			return;
 		}
 
@@ -73,7 +83,7 @@ export function useSheetSource({
 					setLoadState('error');
 				});
 		}
-	}, [gistId, remoteUrl, blank, loadCells, router.replace]);
+	}, [markdown, gistId, remoteUrl, blank, loadCells, router.replace]);
 
 	return {
 		loadState,
