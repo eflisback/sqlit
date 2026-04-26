@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next';
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://sqlit.ebbe.dev';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://sqlit.app';
 
 export default function sitemap(): MetadataRoute.Sitemap {
 	return [

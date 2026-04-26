@@ -5,7 +5,7 @@ SQL (_Structured Query Language_) is how you talk to relational databases. You w
 Let's load a small database with two tables: **users** and **posts**.
 
 ````load
-https://sqlit.ebbe.dev/examples/users.sqlite
+https://sqlit.app/examples/users.sqlite
 ````
 
 ## Selecting data

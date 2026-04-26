@@ -10,7 +10,7 @@ This tool lets you execute _SQL queries_ and _Python code_ directly in your brow
 Below you'll find a cell which loads a remote `.sqlite` file into memory, one that queries it using SQL, and one that queries the same database using Python with the `sqlite3` module.
 
 ````load
-https://sqlit.ebbe.dev/examples/users.sqlite
+https://sqlit.app/examples/users.sqlite
 ````
 
 ````sql

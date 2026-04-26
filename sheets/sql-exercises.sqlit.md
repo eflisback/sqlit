@@ -3,7 +3,7 @@
 Time to write some queries yourself. The database below contains notable buildings across Sweden. In the table: name, city, height (meters), floors, and completion year.
 
 ````load
-https://sqlit.ebbe.dev/examples/buildings.sqlite
+https://sqlit.app/examples/buildings.sqlite
 ````
 
 Start by having a look at what's in there:

@@ -7,7 +7,7 @@ sqlit runs Python via [Pyodide](https://pyodide.org/) - the standard CPython int
 When you load a `.sqlite` file, sqlit makes it available to Python through a special constant: `SQLIT_MEMORY`. Pass it to `sqlite3.connect()` and you're in.
 
 ````load
-https://sqlit.ebbe.dev/examples/users.sqlite
+https://sqlit.app/examples/users.sqlite
 ````
 
 ````python
