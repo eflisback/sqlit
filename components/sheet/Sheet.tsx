@@ -7,6 +7,7 @@ import { EmptySheet } from './EmptySheet';
 import styles from './Sheet.module.css';
 
 export const Sheet = () => {
+	const hasHydrated = useSheetStore((state) => state._hasHydrated);
 	const cells = useSheetStore((state) => state.cells);
 	const setEditableCellId = useSheetStore((state) => state.setEditalbeCellId);
 	const anyRunning = useSheetStore((state) => state.runningCellId !== null);
@@ -41,6 +42,7 @@ export const Sheet = () => {
 		},
 	);
 
+	if (!hasHydrated) return null;
 	if (cells.length === 0) return <EmptySheet />;
 
 	return (

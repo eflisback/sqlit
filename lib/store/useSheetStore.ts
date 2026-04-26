@@ -17,6 +17,8 @@ interface SheetStore {
 	setEditalbeCellId: (id: string | null) => void;
 	sharedGistId: string | null;
 	setSharedGistId: (id: string | null) => void;
+	_hasHydrated: boolean;
+	setHasHydrated: (v: boolean) => void;
 }
 
 export const useSheetStore = create<SheetStore>()(
@@ -59,11 +61,16 @@ export const useSheetStore = create<SheetStore>()(
 			setEditalbeCellId: (id) => set({ editableCellId: id }),
 			sharedGistId: null,
 			setSharedGistId: (id) => set({ sharedGistId: id }),
+			_hasHydrated: false,
+			setHasHydrated: (v) => set({ _hasHydrated: v }),
 		}),
 		{
 			name: 'sheet',
 			version: 2,
 			migrate: (): Partial<SheetStore> => ({ cells: [] }),
+			onRehydrateStorage: () => (state) => {
+				state?.setHasHydrated(true);
+			},
 			partialize: (state) => ({
 				cells: state.cells.map(
 					(cell): CellData =>
